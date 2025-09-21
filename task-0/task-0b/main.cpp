@@ -6,7 +6,6 @@
 #include <map>
 #include <vector>
 
-
 int main(int argc, char* argv[]){
     std::string inFileName = argv[1];
     std::ifstream inputFile(inFileName);
