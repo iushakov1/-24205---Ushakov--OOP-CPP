@@ -5,7 +5,22 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(task_0b
         src/main.cpp
-        src/ResultWriter.cpp
-        src/WordCounter.cpp
-        src/TextReader.cpp)
+        src/resultwriter.cpp
+        src/wordcounter.cpp
+        src/textreader.cpp)
 target_include_directories(task_0b PRIVATE src)
+
+enable_testing()
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS} src)
+
+add_executable(runTests
+        tests/test_textreader.cpp
+        tests/test_wordcounter.cpp
+        tests/test_resultwriter.cpp
+        src/textreader.cpp
+        src/wordcounter.cpp
+        src/resultwriter.cpp
+)
+target_link_libraries(runTests GTest::GTest GTest::Main pthread)
+add_test(NAME runTests COMMAND runTests)

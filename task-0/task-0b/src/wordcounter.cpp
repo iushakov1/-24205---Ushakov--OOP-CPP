@@ -1,4 +1,4 @@
-#include "WordCounter.h"
+#include "wordcounter.h"
 
 #include <list>
 #include <map>

@@ -1,4 +1,4 @@
-#include "ResultWriter.h"
+#include "resultwriter.h"
 
 #include <algorithm>
 #include <fstream>

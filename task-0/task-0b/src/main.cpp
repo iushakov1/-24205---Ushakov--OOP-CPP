@@ -1,6 +1,6 @@
-#include "ResultWriter.h"
-#include "TextReader.h"
-#include "WordCounter.h"
+#include "resultwriter.h"
+#include "textreader.h"
+#include "wordcounter.h"
 
 class Application{
 public:
@@ -14,7 +14,6 @@ private:
     TextReader reader;
     WordCounter counter;
     ResultWriter writer;
-
 };
 
 int main(int argc, char* argv[]){

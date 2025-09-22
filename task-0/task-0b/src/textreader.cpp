@@ -1,7 +1,7 @@
 #ifndef TASK_0B_TEXTREADER_H
 #define TASK_0B_TEXTREADER_H
 
-#include "TextReader.h"
+#include "textreader.h"
 
 #include <list>
 #include <string>
