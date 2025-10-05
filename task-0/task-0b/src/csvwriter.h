@@ -7,9 +7,12 @@
 class CSVWriter {
 public:
     explicit CSVWriter(std::string  filename);
-    void writeVector(const std::vector<std::tuple<std::string, int, double>>& vec);
+    void open();
+    void close();
+    void reset();
+    void write(const std::vector<std::string>&);
 private:
     std::string filename;
-    std::ofstream output;
+    std::ofstream file;
 };
 

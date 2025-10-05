@@ -1,18 +1,22 @@
-#include "../src/wordcounter.h"
 #include "../src/filereader.h"
+#include "../src/linesplitter.h"
+#include "../src/wordcounter.h"
 
 #include <gtest/gtest.h>
 #include <vector>
 
 TEST(wordCounterTest, SimpleLine){
     std::string line = "Fear not. Because, i'm with you";
-    std::ofstream testInput;
-    testInput.open("testInput.txt");
-    testInput << line << std::endl;
+    std::ofstream test_input;
+    test_input.open("test_input.txt");
+    test_input << line << std::endl;
 
-    FileReader reader("testInput.txt");
+    FileReader reader("test_input.txt");
     WordCounter counter;
-    auto words = reader.getSplittedLine();
+    Linesplitter splitter;
+    splitter.splitLine(reader.next());
+
+    auto words = splitter.getWords();
     counter.countWords(words);
     std::string matchWord = " ";
     for(auto el: counter.getWordCount()){
@@ -29,13 +33,16 @@ TEST(wordCounterTest, SimpleLine){
 
 TEST(wordCounterTest, EmptyLine){
     std::string line = " ";
-    std::ofstream testInput;
-    testInput.open("testInput.txt");
-    testInput << line << std::endl;
+    std::ofstream test_input;
+    test_input.open("test_input.txt");
+    test_input << line << std::endl;
 
-    FileReader reader("testInput.txt");
+    FileReader reader("test_input.txt");
     WordCounter counter;
-    auto words = reader.getSplittedLine();
+    Linesplitter splitter;
+    splitter.splitLine(reader.next());
+
+    auto words = splitter.getWords();
     counter.countWords(words);
     EXPECT_EQ(0, counter.getWordCount().size());
 }

@@ -7,9 +7,13 @@
 class FileReader {
 public:
     explicit FileReader(std::string filename);
-    std::vector<std::string> getSplittedLine();
+    void open();
+    void close();
+    bool hasNext();
+    std::string next();
+    void reset();
 private:
     std::string filename;
-    std::ifstream input;
+    std::ifstream file;
 };
 

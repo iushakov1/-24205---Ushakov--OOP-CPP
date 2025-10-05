@@ -4,28 +4,28 @@
 #include <utility>
 #include <vector>
 
-FileReader::FileReader(std::string filename):filename(std::move(filename)) {
-    input.open(this->filename);
+FileReader::FileReader(std::string filename):filename(std::move(filename)){
+    file.open(this->filename);
 }
 
-std::vector<std::string> FileReader::getSplittedLine() {
-    std::vector<std::string> vec;
-    std::string line;
-    if(!std::getline(input, line)){
-        return vec;
-    }
-    size_t start = 0;
-    size_t end = 0;
-    while (start != line.size()) {
-        start = line.find_first_not_of(" ,.", end);
-        if (start == std::string::npos) {
-            break;
-        }
-        end = line.find_first_of(" ,.", start);
-        if (end == std::string::npos) {
-            end = line.size();
-        }
-        vec.push_back(line.substr(start, end - start));
-    }
-    return vec;
+void FileReader::open() {
+    file.open(this->filename);
+}
+
+void FileReader::close() {
+    file.close();
+}
+
+bool FileReader::hasNext() {
+    return !file.eof();
+}
+
+std::string FileReader::next() {
+    std::string nextString;
+    getline(file, nextString);
+    return nextString;
+}
+
+void FileReader::reset() {
+    file.seekg(std::ios::beg);
 }

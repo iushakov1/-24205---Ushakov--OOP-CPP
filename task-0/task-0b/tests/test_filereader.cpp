@@ -1,39 +1,29 @@
 #include "../src/filereader.h"
 
+#include <fstream>
 #include <vector>
 #include <gtest/gtest.h>
 
-TEST(fileReaderTest, SimpleFile){
-    std::ofstream testInput;
-    testInput.open("testInput.txt");
-    std::string line1 = "Fear not. Because, i'm with you\n";
-    std::string line2 = "Stop the Asriel's plans";
-    std::vector<std::string> expVec1 = {"Fear", "not", "Because", "i'm", "with", "you"};
-    std::vector<std::string> expVec2 = {"Stop", "the", "Asriel's", "plans"};
-    testInput << line1 << line2 << std::endl;
+TEST(FileReaderTest, SimpleTest){
+    std::ofstream test_input;
+    test_input.open("test_input.txt");
+    test_input << "hopes and dreams" << std::endl;
+    test_input.close();
 
-    FileReader reader("testInput.txt");
-    std::vector<std::string> splittedLine = reader.getSplittedLine();
-    int i = 0;
-    for(const auto& word: splittedLine){
-        EXPECT_EQ(expVec1[i], word);
-        ++i;
-    }
-    i = 0;
-    splittedLine = reader.getSplittedLine();
-    for(const auto& word: splittedLine){
-        EXPECT_EQ(expVec2[i], word);
-        ++i;
-    }
+    FileReader reader("test_input.txt");
+    std::string line = reader.next();
+    EXPECT_EQ(line, "hopes and dreams");
+    reader.close();
 }
 
-TEST(fileReaderTest, EmptyFile){
-    std::ofstream testInput;
-    testInput.open("testInput.txt");
-    std::string line1 = " ";
-    testInput << line1 << std::endl;
+TEST(FileReaderTest, EmptyFile){
+    std::ofstream test_input;
+    test_input.open("test_input.txt");
+    test_input << "" << std::endl;
+    test_input.close();
 
-    FileReader reader("testInput.txt");
-    std::vector<std::string> splittedLine = reader.getSplittedLine();
-    EXPECT_EQ(0, splittedLine.size());
+    FileReader reader("test_input.txt");
+    std::string line = reader.next();
+    EXPECT_EQ(line, "");
+    reader.close();
 }

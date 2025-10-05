@@ -1,14 +1,28 @@
 #include "csvwriter.h"
 
+#include <string>
 #include <utility>
+#include <vector>
 
 CSVWriter::CSVWriter(std::string  filename): filename(std::move(filename)) {
-    output.open(this->filename);
+    file.open(this->filename);
 }
 
-void CSVWriter::writeVector(const std::vector<std::tuple<std::string, int, double>>& vec) {
-    for(auto line:vec){
-        output << std::get<0>(line) << ' ' << std::get<1>(line) << ' ' << std::get<2>(line) << std::endl;
+void CSVWriter::open() {
+    file.open(filename);
+}
+
+void CSVWriter::close() {
+    file.close();
+}
+
+void CSVWriter::reset() {
+    file.seekp(std::ios::beg);
+}
+
+void CSVWriter::write(const std::vector<std::string>& vec) {
+    for(const auto& line:vec){
+        file << line << std::endl;
     }
 }
 
