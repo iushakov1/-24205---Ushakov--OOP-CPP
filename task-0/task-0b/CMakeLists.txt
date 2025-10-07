@@ -11,8 +11,8 @@ add_executable(task_0b
         src/filereader.h
         src/csvwriter.cpp
         src/csvwriter.h
-        src/linesplitter.cpp
-        src/linesplitter.h
+        src/splitter.cpp
+        src/splitter.h
 )
 target_include_directories(task_0b PRIVATE src)
 
@@ -27,8 +27,8 @@ add_executable(runTests
         src/csvwriter.cpp
         tests/test_linesplitter.cpp
         tests/test_csvwriter.cpp
-        src/linesplitter.cpp
-        src/linesplitter.h
+        src/splitter.cpp
+        src/splitter.h
         tests/test_filereader.cpp
 )
 target_link_libraries(runTests GTest::GTest GTest::Main pthread)

@@ -1,7 +1,8 @@
-#include "linesplitter.h"
+#include "splitter.h"
 
-void Linesplitter::splitLine(const std::string& line) {
+std::vector<std::string> Splitter::split(const std::string& line) {
     std::vector<std::string> vec;
+    std::vector<std::string> words;
     size_t start = 0;
     size_t end = 0;
     while (start != line.size()) {
@@ -15,12 +16,7 @@ void Linesplitter::splitLine(const std::string& line) {
         }
         words.push_back(line.substr(start, end - start));
     }
-}
-
-std::vector<std::string> Linesplitter::getWords() {
     return words;
 }
 
-void Linesplitter::resetWords() {
-    words.clear();
-}
+

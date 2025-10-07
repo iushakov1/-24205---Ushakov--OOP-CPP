@@ -1,6 +1,6 @@
 #include "csvwriter.h"
 #include "filereader.h"
-#include "linesplitter.h"
+#include "splitter.h"
 #include "wordcounter.h"
 
 #include <vector>
@@ -11,15 +11,19 @@ int main(int argc, char* argv[]){
     }
 
     FileReader reader(argv[1]);
-    Linesplitter splitter;
+    Splitter splitter;
     WordCounter counter;
     CSVWriter writer(argv[2]);
 
+    std::vector<std::string> allWords;
+
     while(reader.hasNext()){
         std::string nextLine = reader.next();
-        splitter.splitLine(nextLine);
+        auto newWords = splitter.split(nextLine);
+        allWords.insert(allWords.end(), newWords.begin(), newWords.end());
     }
-    counter.countWords(splitter.getWords());
+
+    counter.countWords(allWords);
 
     std::vector<std::string> outputData;
     for(const auto& stat: counter.getWordCount()){
