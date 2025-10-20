@@ -3,7 +3,16 @@
 #include <stdexcept>
 
 BitArray::BitArray(int num_bits, unsigned long value) {
-    resize(num_bits, value);
+    if (num_bits < 0) {
+        throw std::invalid_argument("Number of bits cannot be negative");
+    }
+    bits.resize(num_bits, false);
+    int bitsToInit = std::min(num_bits, static_cast<int>(sizeof(value) * 8));
+    for (int i = 0; i < bitsToInit; ++i) {
+        if (value & (1UL << i)) {
+            bits[bitsToInit - 1 - i] = true;
+        }
+    }
 }
 
 BitArray::BitArray(const BitArray& b){
@@ -80,7 +89,7 @@ BitArray &BitArray::operator<<=(int n) {
         bits[i] = bits[i+n];
     }
     for(size_t i = bits.size() - n; i < bits.size(); ++i){
-        bits[i] = 0;
+        bits[i] = false;
     }
     return *this;
 }
@@ -156,7 +165,7 @@ bool BitArray::none() const {
 
 BitArray BitArray::operator~() const {
     BitArray result;
-    result.resize(bits.size());
+    result.resize((int)bits.size());
     for(size_t i = 0; i < bits.size(); ++i){
         result.bits[i] = !(bits[i]);
     }
@@ -164,9 +173,9 @@ BitArray BitArray::operator~() const {
 }
 
 int BitArray::count() const {
-    size_t c = 0;
+    int c = 0;
     for(size_t i = 0; i < size(); ++i){
-        c+=bits[i];
+        c+= bits[i];
     }
     return c;
 }
@@ -179,7 +188,7 @@ bool BitArray::operator[](int i) const {
 }
 
 int BitArray::size() const {
-    return bits.size();
+    return (int)bits.size();
 }
 
 bool BitArray::empty() const {
@@ -198,7 +207,7 @@ bool operator==(const BitArray & a, const BitArray & b){
     if (a.size() != b.size()) {
         return false;
     }
-    for (size_t i = 0; i < a.size(); ++i) {
+    for (int i = 0; i < a.size(); ++i) {
         if (a[i] != b[i]) {
             return false;
         }
@@ -216,7 +225,7 @@ BitArray operator&(const BitArray& b1, const BitArray& b2){
     }
     BitArray result;
     result.resize(b1.size());
-    for (size_t i = 0; i < b1.size(); ++i) {
+    for (int i = 0; i < b1.size(); ++i) {
         result.set(i, b1[i] && b2[i]);
     }
     return result;
@@ -228,7 +237,7 @@ BitArray operator|(const BitArray& b1, const BitArray& b2){
     }
     BitArray result;
     result.resize(b1.size());
-    for (size_t i = 0; i < b1.size(); ++i) {
+    for (int i = 0; i < b1.size(); ++i) {
         result.set(i, b1[i] | b2[i]);
     }
     return result;
@@ -240,7 +249,7 @@ BitArray operator^(const BitArray& b1, const BitArray& b2){
     }
     BitArray result;
     result.resize(b1.size());
-    for (size_t i = 0; i < b1.size(); ++i) {
+    for (int i = 0; i < b1.size(); ++i) {
         result.set(i, b1[i] ^ b2[i]);
     }
     return result;
