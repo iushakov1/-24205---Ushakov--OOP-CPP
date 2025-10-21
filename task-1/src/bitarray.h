@@ -1,8 +1,3 @@
-/**
- * @file bitarray.h
- * @brief Bit array class for storing and manipulating bits
- */
-
 #ifndef TASK_1_BITARRAY_H
 #define TASK_1_BITARRAY_H
 
@@ -10,7 +5,7 @@
 #include <vector>
 
 /**
- * @brief Dynamic array of bits with bitwise operations
+ * @brief Dynamic array of bits with bitwise operations.
  *
  * Stores bits efficiently and provides operations like AND, OR, XOR, shifts.
  */
@@ -23,10 +18,10 @@ public:
 
     /**
      * @brief Create bit array with initial size and value
-     * @param num_bits Number of bits
+     * @param numBits Number of bits
      * @param value Initial value for bits
      */
-    explicit BitArray(int num_bits, unsigned long value = 0);
+    explicit BitArray(int numBits, unsigned long value = 0);
 
     /// Copy constructor
     BitArray(const BitArray& b);
@@ -41,10 +36,10 @@ public:
 
     /**
      * @brief Change size of bit array
-     * @param num_bits New size
+     * @param numBits New size
      * @param value Value for new bits (if expanding)
      */
-    void resize(int num_bits, bool value = false);
+    void resize(int numBits, bool value = false);
     /// Remove all bits
     void clear();
     /// Add bit to the end. Making memory redistribution if necessary.

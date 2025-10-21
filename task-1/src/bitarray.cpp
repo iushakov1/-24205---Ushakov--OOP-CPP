@@ -2,12 +2,12 @@
 
 #include <stdexcept>
 
-BitArray::BitArray(int num_bits, unsigned long value) {
-    if (num_bits < 0) {
+BitArray::BitArray(int numBits, unsigned long value) {
+    if (numBits < 0) {
         throw std::invalid_argument("Number of bits cannot be negative");
     }
-    bits.resize(num_bits, false);
-    int bitsToInit = std::min(num_bits, static_cast<int>(sizeof(value) * 8));
+    bits.resize(numBits, false);
+    int bitsToInit = std::min(numBits, static_cast<int>(sizeof(value) * 8));
     for (int i = 0; i < bitsToInit; ++i) {
         if (value & (1UL << i)) {
             bits[bitsToInit - 1 - i] = true;
@@ -32,8 +32,8 @@ BitArray &BitArray::operator=(const BitArray &b) {
     return *this;
 }
 
-void BitArray::resize(int num_bits, bool value) {
-    bits.resize(num_bits, value);
+void BitArray::resize(int numBits, bool value) {
+    bits.resize(numBits, value);
 }
 
 void BitArray::clear() {

@@ -29,6 +29,10 @@ TEST(BitArray, CopyConstructor) {
     }
 }
 
+TEST(BitArray, NegativeNumBits){
+    EXPECT_THROW(BitArray ba(-4),std::invalid_argument);
+}
+
 // memory access tests
 TEST(BitArray, Swap) {
     BitArray a(3, 0b101);
@@ -134,12 +138,40 @@ TEST(BitArray, LeftShiftAssignment) {
     EXPECT_EQ(ba.to_string(), "1010");
 }
 
+TEST(BitArray, ShiftLeftZero) {
+    BitArray ba(4, 0b1101);
+    BitArray original = ba;
+    ba <<= 0;
+    EXPECT_EQ(ba, original);
+    EXPECT_EQ(ba.to_string(), "1101");
+}
+
+TEST(BitArray, ShiftLeftNegative) {
+    BitArray ba(4, 0b1101);
+    ba <<= -2;
+    EXPECT_EQ(ba.to_string(), "0011");
+}
+
 TEST(BitArray, RightShiftAssignment) {
     BitArray ba(4, 0b1101);
 
     ba >>= 1;
 
     EXPECT_EQ(ba.to_string(), "0110");
+}
+
+TEST(BitArray, ShiftRightZero) {
+    BitArray ba(4, 0b1101);
+    BitArray original = ba;
+    ba >>= 0;
+    EXPECT_EQ(ba, original);
+    EXPECT_EQ(ba.to_string(), "1101");
+}
+
+TEST(BitArray, ShiftRightNegative) {
+    BitArray ba(4, 0b1101);
+    ba >>= -2;
+    EXPECT_EQ(ba.to_string(), "0100");
 }
 
 TEST(BitArray, LeftShift) {
@@ -176,7 +208,7 @@ TEST(BitArray, NegativeShift) {
     EXPECT_EQ(ba.to_string(), "0110");
 }
 
-// set bits tests
+// set bits operators tests
 TEST(BitArray, SetSingleBit) {
     BitArray ba(4);
 
@@ -393,16 +425,12 @@ TEST(BitArray, LargeArray) {
 
 TEST(BitArray, SelfAssignment) {
     BitArray ba(4, 0b1100);
-
     ba = ba;
-
     EXPECT_EQ(ba.to_string(), "1100");
 }
 
 TEST(BitArray, ChainOperations) {
     BitArray ba(4, 0b1111);
-
     ba.set(0, false).reset(1).set(2, true).set(3, false);
-
     EXPECT_EQ(ba.to_string(), "0010");
 }
