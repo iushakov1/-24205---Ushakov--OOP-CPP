@@ -208,6 +208,22 @@ TEST(BitArray, NegativeShift) {
     EXPECT_EQ(ba.to_string(), "0110");
 }
 
+TEST(BitArray, BitsIsEmptyOrNIsBigger){
+    BitArray ba1(0);
+    BitArray ba2(3, 0b101);
+    ba1 <<= 2;
+    ba2 <<= 5;
+    EXPECT_EQ(ba1.to_string(), "");
+    EXPECT_EQ(ba2.to_string(), "000");
+
+    BitArray ba3(0);
+    BitArray ba4(3, 0b101);
+    ba1 >>= 2;
+    ba2 >>= 5;
+    EXPECT_EQ(ba1.to_string(), "");
+    EXPECT_EQ(ba2.to_string(), "000");
+}
+
 // set bits operators tests
 TEST(BitArray, SetSingleBit) {
     BitArray ba(4);

@@ -7,7 +7,7 @@
 /**
  * @brief Dynamic array of bits with bitwise operations.
  *
- * Stores bits efficiently and provides operations like AND, OR, XOR, shifts.
+ * Stores bits and provides operations like AND, OR, XOR, shifts.
  */
 
 class BitArray
