@@ -29,6 +29,18 @@ TEST(BitArray, CopyConstructor) {
     }
 }
 
+TEST(BitArray, ImplicitCopyConstructorUse){
+    //initialization
+    BitArray ba1(4, 0b1100);
+    BitArray ba2 = ba1;
+    EXPECT_EQ(ba1.to_string(), ba2.to_string());
+    //container's operation
+    std::vector<BitArray> v;
+    v.push_back(ba1);
+    BitArray ba3 = v.back();
+    EXPECT_EQ(ba3.to_string(), ba1.to_string());
+}
+
 TEST(BitArray, NegativeNumBits){
     EXPECT_THROW(BitArray ba(-4),std::invalid_argument);
 }
@@ -224,7 +236,7 @@ TEST(BitArray, BitsIsEmptyOrNIsBigger){
     EXPECT_EQ(ba2.to_string(), "000");
 }
 
-// set bits operators tests
+// set bit's operators tests
 TEST(BitArray, SetSingleBit) {
     BitArray ba(4);
 
@@ -302,13 +314,31 @@ TEST(BitArray, Count) {
 }
 
 // bits access tests
-TEST(BitArray, OperatorBrackets) {
+TEST(BitArray, OperatorConstBrackets) {
+    const BitArray ba(4, 0b1010);
+
+    EXPECT_TRUE(ba[0]);
+    EXPECT_FALSE(ba[1]);
+    EXPECT_TRUE(ba[2]);
+    EXPECT_FALSE(ba[3]);
+}
+
+TEST(BitArray, OperatorNonConstBrackets){
     BitArray ba(4, 0b1010);
 
     EXPECT_TRUE(ba[0]);
     EXPECT_FALSE(ba[1]);
     EXPECT_TRUE(ba[2]);
     EXPECT_FALSE(ba[3]);
+
+    ba[0] = false;
+    ba[1] = true;
+    ba[2] = ba[0];
+    EXPECT_FALSE(ba[0]);
+    EXPECT_TRUE(ba[1]);
+    EXPECT_FALSE(ba[2]);
+
+    EXPECT_THROW(ba[4] = false, std::out_of_range);
 }
 
 TEST(BitArray, OperatorBracketsOutOfRange) {

@@ -26,7 +26,6 @@ public:
     /// Copy constructor
     BitArray(const BitArray& b);
 
-
     /// Swap contents with another bit array
     void swap(BitArray& b);
 
@@ -75,6 +74,38 @@ public:
 
     // Access bits
     bool operator[](int i) const; ///< Get bit at position i
+
+    /**
+     * @brief Proxy object for a singe bit
+     *
+     * Behaves like a reference to bool for packed storage
+     */
+    class Reference{
+        std::vector<bool>::reference ref;
+    public:
+        /**
+         * Create a proxy for the given bit
+         */
+        Reference(std::vector<bool>::reference r);
+        /**
+         * Set the bit to the given value
+         */
+        Reference& operator=(bool v) noexcept;
+        /**
+        * Copy the value from another bit proxy.
+        */
+        Reference& operator=(const Reference& other) noexcept;
+        /**
+        * Read the current bit value as bool.
+        */
+        operator bool() const noexcept;
+    };
+    /**
+    * Non-const indexed access to a bit.
+    * Returns a proxy that can read/write the bit.
+    * May throw std::out_of_range if index is invalid.
+    */
+    Reference operator[](int i);
 
     // Size information
     int size() const;     ///< Get number of bits

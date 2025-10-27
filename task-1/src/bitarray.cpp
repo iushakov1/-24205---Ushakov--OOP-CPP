@@ -25,7 +25,7 @@ void BitArray::swap(BitArray &b) {
     b = temp;
 }
 
-BitArray &BitArray::operator=(const BitArray &b) {
+BitArray& BitArray::operator=(const BitArray &b) {
     if(this != &b){
         bits = b.bits;
     }
@@ -178,6 +178,28 @@ int BitArray::count() const {
         c+= bits[i];
     }
     return c;
+}
+
+BitArray::Reference::Reference(std::vector<bool>::reference r) : ref(r) {}
+BitArray::Reference::operator bool() const noexcept {
+    return static_cast<bool>(ref);
+}
+
+BitArray::Reference &BitArray::Reference::operator=(bool v) noexcept {
+    ref = v;
+    return *this;
+}
+
+BitArray::Reference &BitArray::Reference::operator=(const BitArray::Reference &other) noexcept {
+    ref = static_cast<bool>(other);
+    return *this;
+}
+
+BitArray::Reference BitArray::operator[](int i) {
+    if (i < 0 || i >= static_cast<int>(bits.size())) {
+        throw std::out_of_range("BitArray index out of range");
+    }
+    return Reference(bits[i]);
 }
 
 bool BitArray::operator[](int i) const {
