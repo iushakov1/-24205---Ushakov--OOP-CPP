@@ -74,14 +74,12 @@ public:
 
     // Access bits
     bool operator[](int i) const; ///< Get bit at position i
-
     /**
      * @brief Proxy object for a singe bit
      *
      * Behaves like a reference to bool for packed storage
      */
     class Reference{
-        std::vector<bool>::reference ref;
     public:
         /**
          * Create a proxy for the given bit
@@ -99,6 +97,8 @@ public:
         * Read the current bit value as bool.
         */
         operator bool() const noexcept;
+    private:
+        std::vector<bool>::reference ref;
     };
     /**
     * Non-const indexed access to a bit.

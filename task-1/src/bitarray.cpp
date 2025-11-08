@@ -202,7 +202,7 @@ BitArray::Reference BitArray::operator[](int i) {
     return Reference(bits[i]);
 }
 
-bool BitArray::operator[](int i) const {
+bool BitArray::operator[](int i) const{
     if (i < 0 || i >= static_cast<int>(bits.size())) {
         throw std::out_of_range("BitArray index out of range");
     }
