@@ -1,5 +1,5 @@
-#include <cstring>
 #include <filesystem>
+#include <fstream>
 
 #include "parser.h"
 
@@ -38,7 +38,7 @@ std::variant<Command, ParseError> Parser::parseCommand(std::string& string) {
     }
     else{
         ParseError error;
-        error.message = "no such command\n";
+        error.message = "unknown command";
         return error;
     }
 }
@@ -46,60 +46,48 @@ std::variant<Command, ParseError> Parser::parseCommand(std::string& string) {
 std::variant<Options, ParseError> Parser::parseArgv(int argc, char **argv) {
     Options options;
     ParseError error;
-
-    if(argc >= 4) {
+    std::fstream tryToOpen;
+    if(argc == 4) {
         options.mode = 3;
         std::string inputPath;
         int iter;
         std::string outputPath;
+        tryToOpen.open(argv[1]);
 
-        if (std::strncmp(argv[1], "--input=", 8) == 0) {
-            inputPath = argv[1] + 8;
-        } else if (std::filesystem::is_directory(argv[1])) {
+        if (tryToOpen.is_open()) {
             inputPath = argv[1];
         } else {
-            error.message = "input directory is invalid\n";
+            error.message = "first argument is not a correct input file path";
             return error;
         }
+        tryToOpen.close();
 
-        int argIndex = 0;
-
-        if (std::strncmp(argv[2], "--iterations=", 13) == 0) {
-            iter = std::stoi(argv[2] + 13);
-            argIndex = 3;
-        }
-        else if (std::strcmp(argv[2], "-i") == 0) {
-            iter = std::stoi(argv[3]);
-            if(argc < 5){
-                error.message = "not enough arguments";
-                return error;
-            }
-            argIndex = 4;
-        } else {
-            error.message = "input iterations parameter is invalid\n";
+        std::string possibleNum = argv[3];
+        if(possibleNum.find_first_not_of("0123456789") != std::string::npos){
+            error.message = "second argument is not a correct iterations number";
             return error;
         }
+        iter = std::stoi(argv[3]);
 
-
-        if (std::strncmp(argv[argIndex], "--output=", 9) == 0) {
-            outputPath = argv[argIndex] + 9;
-        }
-        else if (std::strcmp(argv[argIndex], "-o") == 0) {
-            outputPath = argv[argIndex + 1];
-            if(argc < 5 + (argIndex == 4)){
-                error.message = "not enough arguments";
-                return error;
-            }
-        } else {
-            error.message = "input output's path is invalid\n";
+        outputPath = argv[4];
+        tryToOpen.open(outputPath);
+        if (!tryToOpen.is_open()) {
+            error.message = "third argument is not a correct output path";
             return error;
         }
+        tryToOpen.close();
+
         options.inputPath = inputPath;
         options.outputPath = outputPath;
         options.iteration = iter;
         return options;
     }
     if(argc == 2){
+        tryToOpen.open(argv[1]);
+        if (!tryToOpen.is_open()) {
+            error.message = "invalid file's path";
+            return error;
+        }
         options.mode = 2;
         std::string inputPath = argv[1];
         options.inputPath = inputPath;
@@ -109,6 +97,8 @@ std::variant<Options, ParseError> Parser::parseArgv(int argc, char **argv) {
         options.mode = 1;
         return options;
     }
-    error.message = "unexpected mode";
+    error.message = "unexpected mode.\nto load from presets directory throw no arguments\n"
+                    "to load from specific file write it's path\n"
+                    "to use offline mode write 3 arguments: input file path, iterations number and output path";
     return error;
 }

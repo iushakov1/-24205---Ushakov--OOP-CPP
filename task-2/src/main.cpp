@@ -17,7 +17,8 @@ public:
         if(!std::get_if<Options>(&parsed)){
             auto error = std::get<ParseError>(parsed);
             auto message = error.message;
-            throw std::invalid_argument(message);
+            std::cout << message << std::endl;
+            exit(1);
         }
         options = std::get<Options>(parsed);
         switch (options.mode) {
@@ -45,15 +46,26 @@ private:
         for(auto& p: registry.getPresetList()){
             std::cout << p.id << " " << p.name << std::endl;
         }
-        std::cout << "choose a presets by it's index or quit the program pressing 0" << std::endl;
-        int userChoice = -1;
-        while(userChoice!=0 && !(std::cin >> userChoice)){
-            std::cout << "incorrect index. Try again" << std::endl;
+        std::cout << "choose a presets by it's index or quit the program pressing q" << std::endl;
+        std::string userInput;
+        int userChoice;
+        while(true){
+            std::getline(std::cin, userInput);
+            if(userInput == "q"){
+                exit(0);
+            }
+            if(userInput.find_first_not_of("0123456789") != std::string::npos){
+                std::cout << "incorrect. Try again" << std::endl;
+                continue;
+            }
+            userChoice = std::stoi(userInput);
+            if(!(0<userChoice && userChoice <= registry.getRegistryLen())){
+                std::cout << "incorrect. Try again" << std::endl;
+                continue;
+            }
+            break;
         }
-        if(userChoice == 0){
-            return;
-        }
-        std::cin.ignore();
+
         auto presetInfo = registry.getPresetByInx(userChoice);
 
         Universe universe;
@@ -96,6 +108,9 @@ private:
             else if(command.name == "help"){
                 help();
             }
+            else{
+                std::cout << "unknown command\nuse <help> to get a command's reference" << std::endl;
+            }
             command = getUserCommand();
         }
     }
@@ -106,7 +121,9 @@ private:
         auto parsed = Parser::parseCommand(userInput);
         if(!std::get_if<Command>(&parsed)){
             auto error = std::get<ParseError>(parsed);
-            throw std::invalid_argument(error.message);
+            Command command;
+            command.name = error.message;
+            return  command;
         }
         return std::get<Command>(parsed);
     }
