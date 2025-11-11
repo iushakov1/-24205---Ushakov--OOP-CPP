@@ -24,11 +24,15 @@ void PresetIO::load(const std::filesystem::path &filePath, Universe &universe, R
     FileReader reader(filePath);
     std::string curLine = reader.next();
     if(curLine != "#Life 1.06"){
-        throw std::invalid_argument("incorrect file's format\n");
+        std::cout << "incorrect file's format" << std::endl;
+        exit(1);
     }
     curLine = reader.next();
     size_t un1 = curLine.find_first_not_of("#N ");
-    if (un1 == std::string::npos) throw std::invalid_argument("incorrect universe's name in file\n");
+    if (un1 == std::string::npos){
+        std::cout << "incorrect universe's name in file" << std::endl;
+        exit(1);
+    }
     size_t un2 = curLine.find_first_of(' ', un1);
     std::string universeName = (un2 == std::string::npos) ? curLine.substr(un1) : curLine.substr(un1, un2 - un1);
 
@@ -47,7 +51,8 @@ void PresetIO::load(const std::filesystem::path &filePath, Universe &universe, R
         int x, y;
         take2IntFromString(x, y, curLine);
         if(!(0<=x && x<=width) || !(0<=y && y<=height)){
-            throw std::invalid_argument("incorrect universe cell coordinates in file");
+            std::cout << "incorrect universe cell coordinates in file" << std::endl;
+            exit(1);
         }
         startField[(height - 1 - y) * width + x] = 1;
     }

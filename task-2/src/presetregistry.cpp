@@ -7,7 +7,8 @@
 
 PresetRegistry::PresetRegistry(const std::string &path) {
     if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
-        throw std::invalid_argument("presets directory is not exists. Aborting run\n");
+        std::cout << "presets directory is not exists. Aborting run" << std::endl;
+        exit(1);
     }
     directoryPath = path;
 
@@ -98,7 +99,8 @@ int PresetRegistry::getRegistryLen() const {
 
 std::optional<PresetInfo> PresetRegistry::getPresetByInx(int inx) {
     if(!(0 <= inx-1 && inx-1 <= count-1)){
-        throw std::invalid_argument("wrong index of the parser's list\n");
+        std::cout << "wrong index of the parser's list" << std::endl;
+        exit(1);
     }
     return presets[inx-1];
 }

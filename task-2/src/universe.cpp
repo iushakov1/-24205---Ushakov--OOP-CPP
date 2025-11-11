@@ -5,7 +5,8 @@
 
 Universe::Universe(int xSize, int ySize, std::string name ,std::vector<uint8_t> startField): xSize(xSize), ySize(ySize), name(std::move(name)){
     if((size_t)xSize*(size_t)ySize != startField.size()){
-        throw std::invalid_argument("invalid sizes for start field");
+        std::cout << "invalid sizes for start field" << std::endl;
+        exit(1);
     }
     prevField = std::move(startField);
     nextField.assign(xSize*ySize, 0);
@@ -22,7 +23,8 @@ void Universe::loadUniverse(int lxSize, int lySize, std::string lname, std::vect
     ySize = lySize;
     name = std::move(lname);
     if((size_t)xSize*(size_t)ySize != startField.size()){
-        throw std::invalid_argument("invalid sizes for start field");
+        std::cout << "invalid sizes for start field" << std::endl;
+        exit(1);
     }
     prevField = std::move(startField);
     nextField.assign(xSize*ySize, 0);

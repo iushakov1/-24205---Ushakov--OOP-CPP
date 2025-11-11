@@ -1,8 +1,9 @@
 #include "rule.h"
 
-#include <stdexcept>
-#include <cctype>
 #include <array>
+#include <cctype>
+#include <iostream>
+#include <stdexcept>
 
 static int digit_0_8(char c) {
     if (c < '0' || c > '8') return -1;
@@ -48,25 +49,33 @@ Rule::Rule(const std::string& s) {
         int d = digit_0_8(c);
         if (d >= 0) {
             if (sec == Sec::B) {
-                if (seenB[d]) throw std::invalid_argument("duplicate digit in B");
+                if (seenB[d]){
+                    std::cout << "duplicate digit in B" << std::endl;
+                    exit(1);
+                }
                 seenB[d] = true;
                 birthMask |= (1u << d);
             } else if (sec == Sec::S) {
-                if (seenS[d]) throw std::invalid_argument("duplicate digit in S");
+                if (seenS[d]){
+                    std::cout << "duplicate digit in S" << std::endl;
+                    exit(1);
+                }
                 seenS[d] = true;
                 surviveMask |= (1u << d);
             } else {
-                throw std::invalid_argument("digit before B/S section");
+                std::cout << "digit before B/S section" << std::endl;
+                exit(1);
             }
             ++i;
             continue;
         }
-
-        throw std::invalid_argument("unexpected character in rule");
+        std::cout << "unexpected character in rule" << std::endl;
+        exit(1);
     }
 
     if (!hasB || !hasS) {
-        throw std::invalid_argument("both B and S sections are required");
+        std::cout << "both B and S sections are required" << std::endl;
+        exit(1);
     }
 }
 
@@ -101,25 +110,34 @@ void Rule::loadRule(const std::string &s) {
         int d = digit_0_8(c);
         if (d >= 0) {
             if (sec == Sec::B) {
-                if (seenB[d]) throw std::invalid_argument("duplicate digit in B");
+                if (seenB[d]){
+                    std::cout << "duplicate digit in B" << std::endl;
+                    exit(1);
+                }
                 seenB[d] = true;
                 birthMask |= (1u << d);
             } else if (sec == Sec::S) {
-                if (seenS[d]) throw std::invalid_argument("duplicate digit in S");
+                if (seenB[d]){
+                    std::cout << "duplicate digit in S" << std::endl;
+                    exit(1);
+                }
                 seenS[d] = true;
                 surviveMask |= (1u << d);
             } else {
-                throw std::invalid_argument("digit before B/S section");
+                std::cout << "digit before B/S section" << std::endl;
+                exit(1);
             }
             ++i;
             continue;
         }
 
-        throw std::invalid_argument("unexpected character in rule");
+        std::cout << "unexpected character in rule" << std::endl;
+        exit(1);
     }
 
     if (!hasB || !hasS) {
-        throw std::invalid_argument("both B and S sections are required");
+        std::cout << "both B and S sections are required" << std::endl;
+        exit(1);
     }
 }
 
