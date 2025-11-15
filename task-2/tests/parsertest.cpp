@@ -1,200 +1,182 @@
 #include "parser.h"
 
+#include <cstdio>
+#include <fstream>
 #include <gtest/gtest.h>
+#include <unistd.h>
 
-static char* cstr(const char* s) { return const_cast<char*>(s); }
-
-TEST(ParserArgvTest, Mode3_LongFlags_AllValid) {
-    int argc = 4;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("--input=testInput.life"),
-            cstr("--iterations=10"),
-            cstr("--output=testOutput.life")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<Options>(parsed));
-    const Options& opt = std::get<Options>(parsed);
-    EXPECT_EQ(opt.mode, 3);
-    EXPECT_EQ(opt.inputPath, "testInput.life");
-    EXPECT_EQ(opt.outputPath, "testOutput.life");
-    EXPECT_EQ(opt.iteration, 10);
+TEST(ParseCommandTest, ExitNoArgs) {
+    std::string s = "exit";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<Command>(res));
+    const Command& c = std::get<Command>(res);
+    EXPECT_EQ(c.name, "exit");
+    EXPECT_EQ(c.args, "");
 }
 
-TEST(ParserArgvTest, Mode3_ShortFlags_AllValid) {
-    int argc = 6;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("--input=testInput.life"),
-            cstr("-i"),
-            cstr("7"),
-            cstr("-o"),
-            cstr("out.life")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<Options>(parsed));
-    const Options& opt = std::get<Options>(parsed);
-    EXPECT_EQ(opt.mode, 3);
-    EXPECT_EQ(opt.inputPath, "testInput.life");
-    EXPECT_EQ(opt.outputPath, "out.life");
-    EXPECT_EQ(opt.iteration, 7);
+TEST(ParseCommandTest, DumpWithPath) {
+    std::string s = "dump out.life";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<Command>(res));
+    const Command& c = std::get<Command>(res);
+    EXPECT_EQ(c.name, "dump");
+    EXPECT_EQ(c.args, "out.life");
 }
 
-TEST(ParserArgvTest, Mode3_MissingIterations_Invalid) {
-    int argc = 3;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("--input=testInput.life"),
-            cstr("--output=out.life")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(parsed));
-    EXPECT_NE(std::get<ParseError>(parsed).message.find("unexpected"), std::string::npos);
+TEST(ParseCommandTest, TickAliasTDefault1) {
+    std::string s = "t";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<Command>(res));
+    const Command& c = std::get<Command>(res);
+    EXPECT_EQ(c.name, "tick");
+    EXPECT_EQ(c.digitParam, 1);
 }
 
-TEST(ParserArgvTest, Mode3_InvalidIterationsKey) {
-    int argc = 4;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("--input=testInput.life"),
-            cstr("--iter=10"),
-            cstr("--output=out.life")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(parsed));
-    EXPECT_NE(std::get<ParseError>(parsed).message.find("iterations"), std::string::npos);
+TEST(ParseCommandTest, TickWordDefault1) {
+    std::string s = "tick";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<Command>(res));
+    const Command& c = std::get<Command>(res);
+    EXPECT_EQ(c.name, "tick");
+    EXPECT_EQ(c.digitParam, 1);
 }
 
-TEST(ParserArgvTest, Mode3_ShortI_ButNotEnoughArgs) {
-    int argc = 4;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("--input=testInput.life"),
-            cstr("-i"),
-            cstr("10")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(parsed));
-    EXPECT_NE(std::get<ParseError>(parsed).message.find("not enough arguments"), std::string::npos);
+TEST(ParseCommandTest, TickWithNumber) {
+    std::string s = "tick 15";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<Command>(res));
+    const Command& c = std::get<Command>(res);
+    EXPECT_EQ(c.name, "tick");
+    EXPECT_EQ(c.digitParam, 15);
 }
 
-TEST(ParserArgvTest, Mode3_ShortO_ButNotEnoughArgs) {
-    int argc = 5;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("--input=testInput.life"),
-            cstr("-i"),
-            cstr("10"),
-            cstr("-o")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(parsed));
-    EXPECT_NE(std::get<ParseError>(parsed).message.find("not enough arguments"), std::string::npos);
+TEST(ParseCommandTest, HelpNoArgs) {
+    std::string s = "help";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<Command>(res));
+    const Command& c = std::get<Command>(res);
+    EXPECT_EQ(c.name, "help");
 }
 
-TEST(ParserArgvTest, Mode3_InvalidOutputKey) {
-    int argc = 4;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("--input=testInput.life"),
-            cstr("--iterations=5"),
-            cstr("--out=out.life")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(parsed));
-    EXPECT_NE(std::get<ParseError>(parsed).message.find("output"), std::string::npos);
+TEST(ParseCommandTest, DumpMissingPathError) {
+    std::string s = "dump";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<ParseError>(res));
+    const ParseError& e = std::get<ParseError>(res);
+    EXPECT_EQ(e.message, "dump without file's path\n");
 }
 
-TEST(ParserArgvTest, Mode2_OnlyInputPath) {
-    int argc = 2;
-    char* argv[] = {
-            cstr("task_2"),
-            cstr("input_dir_or_file")
-    };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<Options>(parsed));
-    const Options& opt = std::get<Options>(parsed);
-    EXPECT_EQ(opt.mode, 2);
-    EXPECT_EQ(opt.inputPath, "input_dir_or_file");
+TEST(ParseCommandTest, UnknownCommandError) {
+    std::string s = "foobar 123";
+    auto res = Parser::parseCommand(s);
+    ASSERT_TRUE(std::holds_alternative<ParseError>(res));
+    const ParseError& e = std::get<ParseError>(res);
+    EXPECT_EQ(e.message, "unknown command");
 }
 
-TEST(ParserArgvTest, Mode1_NoArgs) {
+static std::string makeTempFile(const char* prefix) {
+    char tmpl[256];
+    std::snprintf(tmpl, sizeof(tmpl), "/tmp/%sXXXXXX", prefix);
+    int fd = mkstemp(tmpl);
+    if (fd != -1) close(fd);
+    return std::string(tmpl);
+}
+
+TEST(ParseArgvTest, Mode1NoArgs) {
     int argc = 1;
-    char* argv[] = { cstr("task_2") };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<Options>(parsed));
-    const Options& opt = std::get<Options>(parsed);
+    char* argv[] = { (char*)"prog" };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<Options>(res));
+    const Options& opt = std::get<Options>(res);
     EXPECT_EQ(opt.mode, 1);
 }
 
-TEST(ParserArgvTest, UnexpectedMode_Error) {
+TEST(ParseArgvTest, Mode2InputOnlyValid) {
+    auto in = makeTempFile("in_");
+    std::ofstream f(in);
+    f << "x";
+    int argc = 2;
+    char* argv[] = { (char*)"prog", (char*)in.c_str() };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<Options>(res));
+    const Options& opt = std::get<Options>(res);
+    EXPECT_EQ(opt.mode, 2);
+    EXPECT_EQ(opt.inputPath, in);
+}
+
+TEST(ParseArgvTest, Mode2InputOnlyInvalidPathError) {
+    int argc = 2;
+    char* argv[] = { (char*)"prog", (char*)"no_such_file.life" };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<ParseError>(res));
+    const ParseError& e = std::get<ParseError>(res);
+    EXPECT_EQ(e.message, "invalid file's path");
+}
+
+TEST(ParseArgvTest, Mode3AllValid) {
+    auto in = makeTempFile("in_");
+    auto out = makeTempFile("out_");
+    std::ofstream f(in);
+    f << "x";
+    std::ofstream g(out);
+    g << "";
+    int argc = 4;
+    char* argv[] = {
+            (char*)"prog",
+            (char*)in.c_str(),
+            (char*)"10",
+            (char*)out.c_str()
+    };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<Options>(res));
+    const Options& opt = std::get<Options>(res);
+    EXPECT_EQ(opt.mode, 3);
+    EXPECT_EQ(opt.inputPath, in);
+    EXPECT_EQ(opt.iteration, 10);
+    EXPECT_EQ(opt.outputPath, out);
+}
+
+TEST(ParseArgvTest, Mode3BadInputPathError) {
+    auto out = makeTempFile("out_");
+    std::ofstream g(out);
+    g << "";
+    int argc = 4;
+    char* argv[] = { (char*)"prog", (char*)"no_file.life",  (char*)"5", (char*)out.c_str() };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<ParseError>(res));
+    const ParseError& e = std::get<ParseError>(res);
+    EXPECT_EQ(e.message, "first argument is not a correct input file path");
+}
+
+TEST(ParseArgvTest, Mode3BadIterationNumberError) {
+    auto in = makeTempFile("in_");
+    auto out = makeTempFile("out_");
+    { std::ofstream(in) << "x"; std::ofstream(out) << ""; }
+    int argc = 4;
+    char* argv[] = { (char*)"prog", (char*)in.c_str(), (char*)"10a", (char*)out.c_str() };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<ParseError>(res));
+    const ParseError& e = std::get<ParseError>(res);
+    EXPECT_EQ(e.message, "second argument is not a correct iterations number");
+}
+
+TEST(ParseArgvTest, Mode3BadOutputPath_Error) {
+    auto in = makeTempFile("in_");
+    { std::ofstream(in) << "x"; }
+    int argc = 4;
+    char* argv[] = { (char*)"prog", (char*)in.c_str(),  (char*)"7", (char*)"__cannot_open__/file" };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<ParseError>(res));
+    const ParseError& e = std::get<ParseError>(res);
+    EXPECT_EQ(e.message, "third argument is not a correct output path");
+}
+
+TEST(ParseArgvTest, UnexpectedModeErrorMessage) {
     int argc = 3;
-    char* argv[] = { cstr("task_2"), cstr("--foo"), cstr("--bar") };
-    auto parsed = Parser::parseArgv(argc, argv);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(parsed));
-    EXPECT_NE(std::get<ParseError>(parsed).message.find("unexpected"), std::string::npos);
+    char* argv[] = { (char*)"prog", (char*)"one", (char*)"two" };
+    auto res = Parser::parseArgv(argc, argv);
+    ASSERT_TRUE(std::holds_alternative<ParseError>(res));
+    const ParseError& e = std::get<ParseError>(res);
+    EXPECT_NE(e.message.find("unexpected mode."), std::string::npos);
 }
 
-TEST(ParserCommandTest, ExitCommand) {
-    std::string s = "exit";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<Command>(v));
-    const Command& cmd = std::get<Command>(v);
-    EXPECT_EQ(cmd.name, "exit");
-}
-
-TEST(ParserCommandTest, HelpCommand) {
-    std::string s = "help";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<Command>(v));
-    EXPECT_EQ(std::get<Command>(v).name, "help");
-}
-
-TEST(ParserCommandTest, DumpWithoutArg_Error) {
-    std::string s = "dump";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(v));
-    EXPECT_NE(std::get<ParseError>(v).message.find("dump"), std::string::npos);
-}
-
-TEST(ParserCommandTest, DumpWithPath) {
-    std::string s = "dump file.life";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<Command>(v));
-    const Command& cmd = std::get<Command>(v);
-    EXPECT_EQ(cmd.name, "dump");
-    EXPECT_EQ(cmd.args, "file.life");
-}
-
-TEST(ParserCommandTest, TickDefault1) {
-    std::string s = "t";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<Command>(v));
-    const Command& cmd = std::get<Command>(v);
-    EXPECT_EQ(cmd.name, "tick");
-    EXPECT_EQ(cmd.digitParam, 1);
-}
-
-TEST(ParserCommandTest, TickAliasTick) {
-    std::string s = "tick";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<Command>(v));
-    EXPECT_EQ(std::get<Command>(v).name, "tick");
-    EXPECT_EQ(std::get<Command>(v).digitParam, 1);
-}
-
-TEST(ParserCommandTest, TickWithNumber) {
-    std::string s = "tick 5";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<Command>(v));
-    const Command& cmd = std::get<Command>(v);
-    EXPECT_EQ(cmd.name, "tick");
-    EXPECT_EQ(cmd.digitParam, 5);
-}
-
-TEST(ParserCommandTest, UnknownCommand_Error) {
-    std::string s = "foobar";
-    auto v = Parser::parseCommand(s);
-    ASSERT_TRUE(std::holds_alternative<ParseError>(v));
-    EXPECT_NE(std::get<ParseError>(v).message.find("no such command"), std::string::npos);
-}

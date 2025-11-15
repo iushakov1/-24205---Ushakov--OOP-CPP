@@ -62,14 +62,14 @@ std::variant<Options, ParseError> Parser::parseArgv(int argc, char **argv) {
         }
         tryToOpen.close();
 
-        std::string possibleNum = argv[3];
+        std::string possibleNum = argv[2];
         if(possibleNum.find_first_not_of("0123456789") != std::string::npos){
             error.message = "second argument is not a correct iterations number";
             return error;
         }
-        iter = std::stoi(argv[3]);
+        iter = std::stoi(argv[2]);
 
-        outputPath = argv[4];
+        outputPath = argv[3];
         tryToOpen.open(outputPath);
         if (!tryToOpen.is_open()) {
             error.message = "third argument is not a correct output path";

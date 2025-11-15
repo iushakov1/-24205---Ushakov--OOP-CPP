@@ -24,6 +24,12 @@ find_package(GTest REQUIRED)
 add_executable(UnitTests
         tests/parsertest.cpp
         tests/presetiotest.cpp
+        tests/presetregistrytest.cpp
+        tests/rendertest.cpp
+        tests/simulator.cpp
+        tests/ruletests.cpp
+        tests/stepper.cpp
+        tests/universetests.cpp
 )
 
 target_link_libraries(UnitTests PRIVATE
@@ -43,6 +49,7 @@ target_sources(UnitTests PRIVATE
         src/parser.cpp
         src/presetregistry.cpp
         src/presetio.cpp
+        src/render.cpp
 )
 
 include(GoogleTest)

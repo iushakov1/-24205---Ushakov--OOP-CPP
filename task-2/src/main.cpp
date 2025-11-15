@@ -42,16 +42,18 @@ private:
     static void mode1(){
         description(1);
         PresetRegistry registry;
-        registry.loadDirectory("presets");
+        if(registry.loadDirectory("presets")){
+            return;
+        }
         for(auto& p: registry.getPresetList()){
             std::cout << p.id << " " << p.name << std::endl;
         }
-        std::cout << "choose a presets by it's index or quit the program pressing q" << std::endl;
+        std::cout << "choose a presets by it's index or quit the program pressing exit" << std::endl;
         std::string userInput;
         int userChoice;
         while(true){
             std::getline(std::cin, userInput);
-            if(userInput == "q"){
+            if(userInput == "exit"){
                 exit(0);
             }
             if(userInput.find_first_not_of("0123456789") != std::string::npos){

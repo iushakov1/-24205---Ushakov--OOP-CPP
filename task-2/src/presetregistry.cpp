@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -12,8 +13,23 @@ PresetRegistry::PresetRegistry(const std::string &path) {
     }
     directoryPath = path;
 
-    PresetInfo curPreset;
+    std::vector<std::filesystem::directory_entry> directoryEntry;
     for(const std::filesystem::directory_entry& e : std::filesystem::directory_iterator(path)){
+        if(!e.is_regular_file()){
+            continue;
+        }
+        std::ifstream in(e.path());
+        if(!in){
+            std::cerr << "cannot open: " << e.path().string() << std::endl;
+            continue;
+        }
+        directoryEntry.push_back(e);
+    }
+    std::sort(directoryEntry.begin(), directoryEntry.end(), [](const auto& a, const auto& b){ return a.path().filename() < b.path().filename(); });
+
+
+    PresetInfo curPreset;
+    for(const std::filesystem::directory_entry& e : directoryEntry){
         if(!e.is_regular_file()){
             continue;
         }
@@ -39,7 +55,7 @@ PresetRegistry::PresetRegistry(const std::string &path) {
         curPreset.id = count + 1;
         curPreset.path = e.path();
         curPreset.rule = rule;
-        curPreset.name = name.substr(name.find_first_not_of("#N "));;
+        curPreset.name = name.substr(3);
         presets.push_back(curPreset);
         ++count;
     }
@@ -54,8 +70,10 @@ int PresetRegistry::loadDirectory(const std::string& path) {
     count = 0;
     presets.clear();
     directoryPath = path;
+    std::vector<std::filesystem::directory_entry> directoryEntry;
 
     PresetInfo curPreset;
+
     for(const std::filesystem::directory_entry& e : std::filesystem::directory_iterator(path)){
         if(!e.is_regular_file()){
             continue;
@@ -65,7 +83,12 @@ int PresetRegistry::loadDirectory(const std::string& path) {
             std::cerr << "cannot open: " << e.path().string() << std::endl;
             continue;
         }
+        directoryEntry.push_back(e);
+    }
+    std::sort(directoryEntry.begin(), directoryEntry.end(), [](const auto& a, const auto& b){ return a.path().filename() < b.path().filename(); });
 
+    for(const std::filesystem::directory_entry& e : directoryEntry){
+        std::ifstream in(e.path());
         std::string name;
         std::string rule;
         getline(in, name);
@@ -82,7 +105,7 @@ int PresetRegistry::loadDirectory(const std::string& path) {
         curPreset.id = count + 1;
         curPreset.path = e.path();
         curPreset.rule = rule;
-        curPreset.name = name.substr(name.find_first_not_of("#N "));;
+        curPreset.name = name.substr(3);
         presets.push_back(curPreset);
         ++count;
     }
