@@ -97,7 +97,7 @@ public:
         /**
         * Read the current bit value as bool.
         */
-        explicit operator bool() const noexcept;
+        operator bool() const noexcept;
     private:
         std::vector<uint8_t>& bytes;
         int bitInx;
