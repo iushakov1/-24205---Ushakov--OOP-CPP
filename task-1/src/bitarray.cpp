@@ -1,22 +1,21 @@
 #include "bitarray.h"
 
+#include <iostream>
 #include <stdexcept>
 
-BitArray::BitArray(int numBits, unsigned long value) {
+#define byteToBits 8
+
+BitArray::BitArray(int numBits, unsigned int value) {
     if (numBits < 0) {
-        throw std::invalid_argument("Number of bits cannot be negative");
+        throw std::invalid_argument("Number of bytes cannot be negative");
     }
-    bits.resize(numBits, false);
-    int bitsToInit = std::min(numBits, static_cast<int>(sizeof(value) * 8));
-    for (int i = 0; i < bitsToInit; ++i) {
-        if (value & (1UL << i)) {
-            bits[bitsToInit - 1 - i] = true;
-        }
-    }
+    //bytes.resize(numBits, value);
+    this->resize(numBits, value);
 }
 
 BitArray::BitArray(const BitArray& b){
-    bits = b.bits;
+    bytes = b.bytes;
+    bitCount = b.bitCount;
 }
 
 void BitArray::swap(BitArray &b) {
@@ -27,49 +26,74 @@ void BitArray::swap(BitArray &b) {
 
 BitArray& BitArray::operator=(const BitArray &b) {
     if(this != &b){
-        bits = b.bits;
+        bytes = b.bytes;
+        bitCount = b.bitCount;
     }
     return *this;
 }
 
-void BitArray::resize(int numBits, bool value) {
-    bits.resize(numBits, value);
+void BitArray::resize(int numBits, unsigned int value) {
+    if(numBits > bitCount){
+        bytes.resize((numBits / byteToBits) + (numBits % byteToBits != 0), false);
+        int valueBitInx = 0;
+        for(int i = sizeof(value)*8 - 1; i >= 0; --i){
+            if(1<<i & value){
+                valueBitInx = i;
+                break;
+            }
+        }
+        for(int i = bitCount; i < numBits; ++i){
+            auto& curByte = bytes[i / byteToBits];
+            if(value & (1 << (valueBitInx))){
+                curByte |= (1 << (byteToBits - i%byteToBits - 1));
+            }
+            --valueBitInx;
+            if(valueBitInx < 0){
+                break;
+            }
+        }
+    }
+    else{
+        bytes.resize((numBits / byteToBits) + (numBits % byteToBits != 0), false);
+    }
+    bitCount = numBits;
 }
 
 void BitArray::clear() {
-    bits.clear();
+    bytes.clear();
+    bitCount = 0;
 }
 
 void BitArray::push_back(bool bit) {
-    bits.push_back(bit);
+    this->resize(bitCount + 1, bit ? 1 : 0);
 }
 
 BitArray &BitArray::operator&=(const BitArray &b) {
-    if(bits.size() != b.bits.size()){
+    if(bitCount != b.bitCount){
         throw std::invalid_argument("BitArray's must have equal size for &=");
     }
-    for(size_t i = 0; i < bits.size(); ++i){
-        bits[i] = bits[i] & b.bits[i];
+    for(size_t i = 0; i < bytes.size(); ++i){
+        bytes[i] = bytes[i] & b.bytes[i];
     }
     return *this;
 }
 
 BitArray &BitArray::operator|=(const BitArray &b) {
-    if(bits.size() != b.bits.size()){
+    if(bitCount != b.bitCount){
         throw std::invalid_argument("BitArray's must have equal size for |=");
     }
-    for(size_t i = 0; i < bits.size(); ++i){
-        bits[i] = bits[i] | b.bits[i];
+    for(size_t i = 0; i < bytes.size(); ++i){
+        bytes[i] = bytes[i] | b.bytes[i];
     }
     return *this;
 }
 
 BitArray &BitArray::operator^=(const BitArray &b) {
-    if(bits.size() != b.bits.size()){
+    if(bitCount != b.bitCount){
         throw std::invalid_argument("BitArray's must have equal size for ^=");
     }
-    for(size_t i = 0; i < bits.size(); ++i){
-        bits[i] = bits[i] ^ b.bits[i];
+    for(size_t i = 0; i < bytes.size(); ++i){
+        bytes[i] = bytes[i] ^ b.bytes[i];
     }
     return *this;
 }
@@ -81,15 +105,15 @@ BitArray &BitArray::operator<<=(int n) {
     if(n < 0){
         return *this >>= (-n);
     }
-    if(bits.empty() || n >= bits.size()){
-        std::fill(bits.begin(), bits.end(), false);
+    if(n >= bitCount){
+        std::fill(bytes.begin(), bytes.end(), false);
         return *this;
     }
-    for(size_t i = 0; i < bits.size() - n; ++i){
-        bits[i] = bits[i+n];
+    for(int i = 0; i < bitCount; ++i){
+        (*this)[i] = (*this)[i+n];
     }
-    for(size_t i = bits.size() - n; i < bits.size(); ++i){
-        bits[i] = false;
+    for(int i = bitCount - n; i < bitCount; ++i){
+        (*this)[i] = false;
     }
     return *this;
 }
@@ -101,15 +125,15 @@ BitArray &BitArray::operator>>=(int n) {
     if(n < 0){
         return *this <<= (-n);
     }
-    if (bits.empty() || n >= bits.size()) {
-        std::fill(bits.begin(), bits.end(), false);
+    if (n >= bitCount) {
+        std::fill(bytes.begin(), bytes.end(), false);
         return *this;
     }
-    for (size_t i = bits.size() - 1; i >= n; --i) {
-        bits[i] = bits[i - n];
+    for(int i = bitCount - 1; i >= n; --i){
+        (*this)[i] = (*this)[i-n];
     }
-    for (size_t i = 0; i < n; ++i) {
-        bits[i] = false;
+    for(int i = 0; i < n; ++i){
+        (*this)[i] = false;
     }
     return *this;
 }
@@ -127,32 +151,37 @@ BitArray BitArray::operator>>(int n) const {
 }
 
 BitArray &BitArray::set(int n, bool val) {
-    bits[n] = val;
+    if(val == false){
+        bytes[n/byteToBits] &= ~(1 << (byteToBits - n%byteToBits - 1));
+    }
+    else{
+        bytes[n/byteToBits] |= (1 << (byteToBits - n%byteToBits - 1));
+    }
     return *this;
 }
 
 BitArray &BitArray::set() {
-    for(size_t i = 0; i < size(); ++i){
-        bits[i] = true;
+    for(int i = 0; i < bitCount; ++i){
+        bytes[i/byteToBits] |= (1 << (byteToBits - i%byteToBits - 1));
     }
     return *this;
 }
 
 BitArray &BitArray::reset(int n) {
-    bits[n] = false;
+    bytes[n/byteToBits] &= ~(1 << (byteToBits - n%byteToBits - 1));
     return *this;
 }
 
 BitArray &BitArray::reset() {
-    for(size_t i = 0; i < size(); ++i){
-        bits[i] = false;
+    for(int i = 0; i < bitCount; ++i){
+        bytes[i/byteToBits] &= ~(1 << (byteToBits - i%byteToBits - 1));
     }
     return *this;
 }
 
 bool BitArray::any() const {
-    for(size_t i = 0; i < size(); ++i){
-        if(bits[i]){
+    for(int i = 0; i < bitCount; ++i){
+        if((*this)[i]){
             return true;
         }
     }
@@ -165,71 +194,77 @@ bool BitArray::none() const {
 
 BitArray BitArray::operator~() const {
     BitArray result;
-    result.resize((int)bits.size());
-    for(size_t i = 0; i < bits.size(); ++i){
-        result.bits[i] = !(bits[i]);
+    result.resize(bitCount);
+    for(int i = 0; i < bitCount; ++i){
+        result[i] = !(*this)[i];
     }
     return result;
 }
 
 int BitArray::count() const {
     int c = 0;
-    for(size_t i = 0; i < size(); ++i){
-        c+= bits[i];
+    for(int i = 0; i < bitCount; ++i){
+        c += (*this)[i];
     }
     return c;
 }
 
-BitArray::Reference::Reference(std::vector<bool>::reference r) : ref(r) {}
-BitArray::Reference::operator bool() const noexcept {
-    return static_cast<bool>(ref);
+BitArray::Bit::Bit(std::vector<uint8_t>& bytes, int bitInx) : bytes(bytes), bitInx(bitInx) {}
+BitArray::Bit::operator bool() const noexcept {
+    return bool(( 1<<(byteToBits - bitInx%byteToBits - 1) ) & ( bytes[bitInx/byteToBits] ));
 }
 
-BitArray::Reference &BitArray::Reference::operator=(bool v) noexcept {
-    ref = v;
+BitArray::Bit &BitArray::Bit::operator=(bool v) noexcept {
+    if(!v){
+        bytes[bitInx/byteToBits] &= ~(1 << (byteToBits - bitInx%byteToBits - 1));
+    }
+    else{
+        bytes[bitInx/byteToBits] |= (1 << (byteToBits - bitInx%byteToBits - 1));
+    }
     return *this;
 }
 
-BitArray::Reference &BitArray::Reference::operator=(const BitArray::Reference &other) noexcept {
-    ref = static_cast<bool>(other);
+BitArray::Bit &BitArray::Bit::operator=(const BitArray::Bit &other) noexcept {
+    bool value = static_cast<bool>(other);
+    *this = value;
     return *this;
 }
 
-BitArray::Reference BitArray::operator[](int i) {
-    if (i < 0 || i >= static_cast<int>(bits.size())) {
+BitArray::Bit BitArray::operator[](int i) {
+    if (i < 0 || i >= bytes.size()*byteToBits) {
         throw std::out_of_range("BitArray index out of range");
     }
-    return Reference(bits[i]);
+    return Bit(bytes, i);
 }
 
 bool BitArray::operator[](int i) const{
-    if (i < 0 || i >= static_cast<int>(bits.size())) {
+    if (i < 0 || i >= bytes.size()*byteToBits) {
         throw std::out_of_range("BitArray index out of range");
     }
-    return bits[i];
+    return bytes[i/byteToBits] & 1<<(byteToBits - i%byteToBits - 1);
 }
 
 int BitArray::size() const {
-    return (int)bits.size();
+    return bytes.size();
 }
 
 bool BitArray::empty() const {
-    return bits.empty();
+    return bitCount == 0;
 }
 
 std::string BitArray::to_string() const {
     std::string result;
-    for (bool bit : bits) {
-        result += bit ? '1' : '0';
+    for(int i = 0; i < bitCount; ++i){
+        result += (*this)[i] ? '1' : '0';
     }
     return result;
 }
 
 bool operator==(const BitArray & a, const BitArray & b){
-    if (a.size() != b.size()) {
+    if (a.getBitCount() != b.getBitCount()) {
         return false;
     }
-    for (int i = 0; i < a.size(); ++i) {
+    for (int i = 0; i < a.getBitCount(); ++i) {
         if (a[i] != b[i]) {
             return false;
         }
@@ -242,37 +277,42 @@ bool operator!=(const BitArray& a, const BitArray& b) {
 }
 
 BitArray operator&(const BitArray& b1, const BitArray& b2){
-    if (b1.size() != b2.size()) {
+    if (b1.getBitCount() != b2.getBitCount()) {
         throw std::invalid_argument("BitArray sizes must be equal for &");
     }
     BitArray result;
-    result.resize(b1.size());
-    for (int i = 0; i < b1.size(); ++i) {
+    result.resize(b1.getBitCount());
+    for (int i = 0; i < b1.getBitCount(); ++i) {
+        auto val = b1[i] && b2[i];
         result.set(i, b1[i] && b2[i]);
     }
     return result;
 }
 
 BitArray operator|(const BitArray& b1, const BitArray& b2){
-    if (b1.size() != b2.size()) {
+    if (b1.getBitCount() != b2.getBitCount()) {
         throw std::invalid_argument("BitArray sizes must be equal for |");
     }
     BitArray result;
-    result.resize(b1.size());
-    for (int i = 0; i < b1.size(); ++i) {
+    result.resize(b1.getBitCount());
+    for (int i = 0; i < b1.getBitCount(); ++i) {
         result.set(i, b1[i] | b2[i]);
     }
     return result;
 }
 
 BitArray operator^(const BitArray& b1, const BitArray& b2){
-    if (b1.size() != b2.size()) {
+    if (b1.getBitCount() != b2.getBitCount()) {
         throw std::invalid_argument("BitArray sizes must be equal for ^");
     }
     BitArray result;
-    result.resize(b1.size());
-    for (int i = 0; i < b1.size(); ++i) {
+    result.resize(b1.getBitCount());
+    for (int i = 0; i < b1.getBitCount(); ++i) {
         result.set(i, b1[i] ^ b2[i]);
     }
     return result;
+}
+
+int BitArray::getBitCount() const {
+    return bitCount;
 }

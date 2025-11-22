@@ -1,13 +1,14 @@
 #ifndef TASK_1_BITARRAY_H
 #define TASK_1_BITARRAY_H
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
 /**
- * @brief Dynamic array of bits with bitwise operations.
+ * @brief Dynamic array of bytes with bitwise operations.
  *
- * Stores bits and provides operations like AND, OR, XOR, shifts.
+ * Stores bytes and provides operations like AND, OR, XOR, shifts.
  */
 
 class BitArray
@@ -18,10 +19,10 @@ public:
 
     /**
      * @brief Create bit array with initial size and value
-     * @param numBits Number of bits
-     * @param value Initial value for bits
+     * @param numBits Number of bytes
+     * @param value Initial value for bytes
      */
-    explicit BitArray(int numBits, unsigned long value = 0);
+    explicit BitArray(int numBits, unsigned int value = 0);
 
     /// Copy constructor
     BitArray(const BitArray& b);
@@ -36,10 +37,10 @@ public:
     /**
      * @brief Change size of bit array
      * @param numBits New size
-     * @param value Value for new bits (if expanding)
+     * @param value Value for new bytes (if expanding)
      */
-    void resize(int numBits, bool value = false);
-    /// Remove all bits
+    void resize(int numBits, unsigned int value = 0);
+    /// Remove all bytes
     void clear();
     /// Add bit to the end. Making memory redistribution if necessary.
     void push_back(bool bit);
@@ -59,62 +60,65 @@ public:
     BitArray operator<<(int n) const;  ///< left shift (new array)
     BitArray operator>>(int n) const;  ///< right shift (new array)
 
-    // Set bits to true/false
+    // Set bytes to true/false
     BitArray& set(int n, bool val = true); ///< set one bit on n-index with val
-    BitArray& set(); ///< set all bits to true
+    BitArray& set(); ///< set all bytes to true
     BitArray& reset(int n); ///< set one bit to false on n-index
-    BitArray& reset(); ///< set all bits to false
+    BitArray& reset(); ///< set all bytes to false
 
-    // Check bits
+    // Check bytes
     bool any() const; ///< True if any bit is 1
-    bool none() const; ///< True if all bits are 0
-    BitArray operator~() const; ///< Invert all bits (NOT)
-    int count() const; ///< Count 1 bits
+    bool none() const; ///< True if all bytes are 0
+    BitArray operator~() const; ///< Invert all bytes (NOT)
+    int count() const; ///< Count 1 bytes
 
 
-    // Access bits
+    // Access bytes
     bool operator[](int i) const; ///< Get bit at position i
     /**
      * @brief Proxy object for a singe bit
      *
      * Behaves like a reference to bool for packed storage
      */
-    class Reference{
+    class Bit{
     public:
         /**
          * Create a proxy for the given bit
          */
-        Reference(std::vector<bool>::reference r);
+        Bit(std::vector<uint8_t>&, int bitInx);
         /**
          * Set the bit to the given value
          */
-        Reference& operator=(bool v) noexcept;
+        Bit& operator=(bool v) noexcept;
         /**
         * Copy the value from another bit proxy.
         */
-        Reference& operator=(const Reference& other) noexcept;
+        Bit& operator=(const Bit& other) noexcept;
         /**
         * Read the current bit value as bool.
         */
         operator bool() const noexcept;
     private:
-        std::vector<bool>::reference ref;
+        std::vector<uint8_t>& bytes;
+        int bitInx;
     };
     /**
     * Non-const indexed access to a bit.
     * Returns a proxy that can read/write the bit.
     * May throw std::out_of_range if index is invalid.
     */
-    Reference operator[](int i);
+    Bit operator[](int i);
 
     // Size information
-    int size() const;     ///< Get number of bits
+    int size() const;     ///< Get number of bytes
+    int getBitCount() const;
     bool empty() const;   ///< Check if array is empty
 
     /// Convert to string of '1's and '0's
     std::string to_string() const;
 private:
-    std::vector<bool> bits;
+    std::vector<uint8_t> bytes;
+    int bitCount = 0;
 };
 
 // Comparison operators

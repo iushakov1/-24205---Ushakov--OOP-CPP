@@ -10,13 +10,14 @@ TEST(BitArray, DefaultConstructor) {
 
 TEST(BitArray, SizeConstructor) {
     BitArray ba(5);
-    EXPECT_EQ(ba.size(), 5);
+    EXPECT_EQ(ba.getBitCount(), 5);
     EXPECT_TRUE(ba.none());
 }
 
 TEST(BitArray, ValueConstructor) {
     BitArray ba(4, 0b1100);
-    EXPECT_EQ(ba.size(), 4);
+    EXPECT_EQ(ba.size(), 1);
+    EXPECT_EQ(ba.getBitCount(), 4);
     EXPECT_EQ(ba.count(), 2);
 }
 
@@ -52,8 +53,8 @@ TEST(BitArray, Swap) {
 
     a.swap(b);
 
-    EXPECT_EQ(a.size(), 2);
-    EXPECT_EQ(b.size(), 3);
+    EXPECT_EQ(a.getBitCount(), 2);
+    EXPECT_EQ(b.getBitCount(), 3);
     EXPECT_TRUE(a[0]);
     EXPECT_FALSE(a[1]);
     EXPECT_TRUE(b[0]);
@@ -67,21 +68,21 @@ TEST(BitArray, AssignmentOperator) {
 
     a = b;
 
-    EXPECT_EQ(a.size(), 2);
+    EXPECT_EQ(a.getBitCount(), 2);
     EXPECT_TRUE(a[0]);
     EXPECT_FALSE(a[1]);
 }
 
 TEST(BitArray, Resize) {
     BitArray ba(3, 0b101);
-    ba.resize(5, true);
+    ba.resize(5, 1);
 
-    EXPECT_EQ(ba.size(), 5);
+    EXPECT_EQ(ba.getBitCount(), 5);
     EXPECT_TRUE(ba[0]);
     EXPECT_FALSE(ba[1]);
     EXPECT_TRUE(ba[2]);
     EXPECT_TRUE(ba[3]);
-    EXPECT_TRUE(ba[4]);
+    EXPECT_FALSE(ba[4]);
 }
 
 TEST(BitArray, Clear) {
@@ -98,7 +99,7 @@ TEST(BitArray, PushBack) {
     ba.push_back(false);
     ba.push_back(true);
 
-    EXPECT_EQ(ba.size(), 3);
+    EXPECT_EQ(ba.getBitCount(), 3);
     EXPECT_TRUE(ba[0]);
     EXPECT_FALSE(ba[1]);
     EXPECT_TRUE(ba[2]);
@@ -273,7 +274,7 @@ TEST(BitArray, ResetAllBits) {
     EXPECT_EQ(ba.count(), 0);
 }
 
-// check bits test
+// check bytes test
 TEST(BitArray, Any) {
     BitArray empty(3);
     BitArray some(4, 0b1000);
@@ -313,7 +314,7 @@ TEST(BitArray, Count) {
     EXPECT_EQ(full.count(), 3);
 }
 
-// bits access tests
+// bytes access tests
 TEST(BitArray, OperatorConstBrackets) {
     const BitArray ba(4, 0b1010);
 
@@ -338,24 +339,24 @@ TEST(BitArray, OperatorNonConstBrackets){
     EXPECT_TRUE(ba[1]);
     EXPECT_FALSE(ba[2]);
 
-    EXPECT_THROW(ba[4] = false, std::out_of_range);
+    EXPECT_THROW(ba[9] = false, std::out_of_range);
 }
 
 TEST(BitArray, OperatorBracketsOutOfRange) {
     BitArray ba(3);
 
     EXPECT_THROW(ba[-1], std::out_of_range);
-    EXPECT_THROW(ba[3], std::out_of_range);
+    EXPECT_THROW(ba[11], std::out_of_range);
 }
 
-TEST(BitArray, Size) {
+TEST(BitArray, BitCount) {
     BitArray empty;
     BitArray small(3);
     BitArray large(100);
 
-    EXPECT_EQ(empty.size(), 0);
-    EXPECT_EQ(small.size(), 3);
-    EXPECT_EQ(large.size(), 100);
+    EXPECT_EQ(empty.getBitCount(), 0);
+    EXPECT_EQ(small.getBitCount(), 3);
+    EXPECT_EQ(large.getBitCount(), 100);
 }
 
 TEST(BitArray, Empty) {
@@ -445,7 +446,7 @@ TEST(BitArray, GlobalOperationsDifferentSize) {
 TEST(BitArray, SingleBitArray) {
     BitArray ba(1, true);
 
-    EXPECT_EQ(ba.size(), 1);
+    EXPECT_EQ(ba.getBitCount(), 1);
     EXPECT_TRUE(ba[0]);
     EXPECT_TRUE(ba.any());
     EXPECT_FALSE(ba.none());
@@ -462,10 +463,10 @@ TEST(BitArray, SingleBitArray) {
 TEST(BitArray, LargeArray) {
     BitArray ba(1000, 0xFFFFFFFF);
 
-    EXPECT_EQ(ba.size(), 1000);
+    EXPECT_EQ(ba.getBitCount(), 1000);
     EXPECT_EQ(ba.count(), 32);
 
-    ba.reset(36);
+    ba.reset(16);
     EXPECT_EQ(ba.count(), 31);
 }
 
