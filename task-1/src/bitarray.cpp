@@ -1,6 +1,5 @@
 #include "bitarray.h"
 
-#include <iostream>
 #include <stdexcept>
 
 #define byteToBits 8
@@ -9,7 +8,6 @@ BitArray::BitArray(int numBits, unsigned int value) {
     if (numBits < 0) {
         throw std::invalid_argument("Number of bytes cannot be negative");
     }
-    //bytes.resize(numBits, value);
     this->resize(numBits, value);
 }
 
@@ -151,7 +149,7 @@ BitArray BitArray::operator>>(int n) const {
 }
 
 BitArray &BitArray::set(int n, bool val) {
-    if(val == false){
+    if(!val){
         bytes[n/byteToBits] &= ~(1 << (byteToBits - n%byteToBits - 1));
     }
     else{
@@ -244,7 +242,7 @@ bool BitArray::operator[](int i) const{
     return bytes[i/byteToBits] & 1<<(byteToBits - i%byteToBits - 1);
 }
 
-int BitArray::size() const {
+size_t BitArray::size() const {
     return bytes.size();
 }
 
@@ -283,7 +281,6 @@ BitArray operator&(const BitArray& b1, const BitArray& b2){
     BitArray result;
     result.resize(b1.getBitCount());
     for (int i = 0; i < b1.getBitCount(); ++i) {
-        auto val = b1[i] && b2[i];
         result.set(i, b1[i] && b2[i]);
     }
     return result;

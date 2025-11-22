@@ -37,7 +37,7 @@ public:
     /**
      * @brief Change size of bit array
      * @param numBits New size
-     * @param value Value for new bytes (if expanding)
+     * @param value Value to init new bytes (if expanding)
      */
     void resize(int numBits, unsigned int value = 0);
     /// Remove all bytes
@@ -97,7 +97,7 @@ public:
         /**
         * Read the current bit value as bool.
         */
-        operator bool() const noexcept;
+        explicit operator bool() const noexcept;
     private:
         std::vector<uint8_t>& bytes;
         int bitInx;
@@ -110,8 +110,8 @@ public:
     Bit operator[](int i);
 
     // Size information
-    int size() const;     ///< Get number of bytes
-    int getBitCount() const;
+    size_t size() const;     ///< Get number of inited bytes
+    int getBitCount() const; ///< Get inited bits
     bool empty() const;   ///< Check if array is empty
 
     /// Convert to string of '1's and '0's
