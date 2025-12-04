@@ -6,10 +6,9 @@
 
 class Render {
 public:
-    explicit Render(std::string aliveInons = "0", bool clear=true);
+    explicit Render(bool isClear=false);
     void draw(const uint8_t* data, int w, int h) noexcept;
 private:
-    std::string alive;
     bool isClear;
 };
 

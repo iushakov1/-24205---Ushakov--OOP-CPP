@@ -8,15 +8,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(task_2
         src/main.cpp
         src/universe.cpp
-        src/stepper.cpp
         src/rule.cpp
         src/filereader.cpp
         src/filewritter.cpp
         src/render.cpp
-        src/simulator.cpp
         src/parser.cpp
         src/presetregistry.cpp
-        src/presetio.cpp
+        src/preset.cpp
+        src/preset.h
+        src/command.cpp
+        src/command.h
+        src/mode.cpp
+        src/mode.h
 )
 
 find_package(GTest REQUIRED)
@@ -40,15 +43,12 @@ target_include_directories(UnitTests PRIVATE
 )
 
 target_sources(UnitTests PRIVATE
-        src/simulator.cpp
         src/universe.cpp
-        src/stepper.cpp
         src/rule.cpp
         src/filereader.cpp
         src/filewritter.cpp
         src/parser.cpp
         src/presetregistry.cpp
-        src/presetio.cpp
         src/render.cpp
 )
 

@@ -9,12 +9,12 @@ public:
     Rule() = default;
     explicit Rule(const std::string& rule);
     void loadRule(const std::string& rule);
-    [[nodiscard]] uint8_t decide(int n, uint8_t alive) const noexcept;
-    [[nodiscard]] std::string getRule() const noexcept;
-    [[nodiscard]] uint16_t GetBirthMask()   const noexcept {return birthMask;}
-    [[nodiscard]] uint16_t GetSurviveMask() const noexcept {return surviveMask;}
-
+    uint8_t decide(int n, uint8_t cellStatus) const noexcept;
+    std::string getRule() const noexcept;
 private:
+    uint16_t GetBirthMask()   const noexcept {return birthMask;}
+    uint16_t GetSurviveMask() const noexcept {return surviveMask;}
+    int digit_0_8(char c);
     uint16_t birthMask = 0;
     uint16_t surviveMask = 0;
 };

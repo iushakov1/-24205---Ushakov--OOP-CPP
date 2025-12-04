@@ -15,7 +15,7 @@ TEST(SimulatorTest, AccessorsReflectUniverseAndRule) {
     EXPECT_EQ(sim.getUniverseName(), "demo");
     EXPECT_EQ(sim.getRule(), "#R B3/S23");
 
-    EXPECT_EQ(sim.getUniverseData(), u.dataCur());
+    EXPECT_EQ(sim.getUniverseData(), u.getCurData());
 }
 
 TEST(SimulatorTest, TickZeroDoesNothing) {

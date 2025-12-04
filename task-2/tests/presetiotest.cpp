@@ -75,7 +75,7 @@ TEST(PresetIOTest, LoadParsesCorrectFile) {
     EXPECT_EQ(u.getHeight(), 2);
     EXPECT_EQ(r.getRule(), "#R B5/S23");
 
-    const uint8_t* cur = u.dataCur();
+    const uint8_t* cur = u.getCurData();
     std::vector<uint8_t> expect = { 0,0,1, 1,0,0 };
     for (size_t i = 0; i < expect.size(); ++i)
         EXPECT_EQ(cur[i], expect[i]);
@@ -146,8 +146,8 @@ TEST(PresetIOTest, SaveThenLoad_RoundTrip) {
     EXPECT_EQ(u1.getName(), u0.getName());
     EXPECT_EQ(u1.getWidth(), u0.getWidth());
     EXPECT_EQ(u1.getHeight(), u0.getHeight());
-    auto u0cur = u0.dataCur();
-    auto u1cur = u1.dataCur();
+    auto u0cur = u0.getCurData();
+    auto u1cur = u1.getCurData();
     auto u0h = u0.getHeight();
     auto u0w = u0.getWidth();
     int i = 0;

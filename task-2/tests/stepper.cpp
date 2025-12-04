@@ -14,7 +14,7 @@ TEST(StepperUniverseIntegration, EmptyWorldStaysEmpty) {
     Rule r("B3/S23");
     stepAndSwap(u, r);
     for (int i = 0; i < 9; ++i){
-        EXPECT_EQ(u.dataCur()[i], 0);
+        EXPECT_EQ(u.getCurData()[i], 0);
     }
 }
 
@@ -27,7 +27,7 @@ TEST(StepperUniverseIntegration, SingleCellDies) {
     Universe u(3, 3, "u", start);
     Rule r("B3/S23");
     stepAndSwap(u, r);
-    for (int i = 0; i < 9; ++i) EXPECT_EQ(u.dataCur()[i], 0);
+    for (int i = 0; i < 9; ++i) EXPECT_EQ(u.getCurData()[i], 0);
 }
 
 TEST(StepperUniverseIntegration, ToroidalEdges) {
@@ -40,7 +40,7 @@ TEST(StepperUniverseIntegration, ToroidalEdges) {
     Rule r("B3/S23");
 
     stepAndSwap(u, r);
-    EXPECT_EQ(u.dataCur()[0], 1);
+    EXPECT_EQ(u.getCurData()[0], 1);
 }
 
 TEST(StepperUniverseIntegration, DimensionsAndAccessors) {
@@ -48,6 +48,6 @@ TEST(StepperUniverseIntegration, DimensionsAndAccessors) {
     EXPECT_EQ(u.getWidth(), 4);
     EXPECT_EQ(u.getHeight(), 3);
     EXPECT_EQ(u.getName(), "name");
-    ASSERT_NE(u.dataCur(), nullptr);
-    ASSERT_NE(u.dataNext(), nullptr);
+    ASSERT_NE(u.getCurData(), nullptr);
+    ASSERT_NE(u.getNextData(), nullptr);
 }

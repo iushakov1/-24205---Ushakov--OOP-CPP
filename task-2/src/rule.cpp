@@ -5,16 +5,16 @@
 #include <iostream>
 #include <stdexcept>
 
-static int digit_0_8(char c) {
+int Rule::digit_0_8(char c) {
     if (c < '0' || c > '8') return -1;
     return c - '0';
 }
 
-uint8_t Rule::decide(int n, uint8_t alive) const noexcept {
-    return alive ? ((surviveMask >> n) & 1u) : ((birthMask >> n) & 1u);
+uint8_t Rule::decide(int n, uint8_t cellStatus) const noexcept {
+    return cellStatus ? ((surviveMask >> n) & 1u) : ((birthMask >> n) & 1u);
 }
 
-static bool isSpace(char c) noexcept {
+bool isSpace(char c) noexcept {
     return std::isspace(c) != 0;
 }
 
