@@ -11,7 +11,7 @@
 Preset::Preset(const std::string &filePath) {
     std::ifstream in(filePath);
     if(!in){
-        std::cerr << "cannot open: " << filePath << std::endl;
+        std::cerr << "preset: cannot open: " << filePath << std::endl;
         exit(1);
     }
 
@@ -19,12 +19,12 @@ Preset::Preset(const std::string &filePath) {
     std::string curRule;
     getline(in, curName);
     if(!std::getline(in, curName)){
-        std::cerr << "wrong file's format: " << filePath << std::endl;
+        std::cerr << "preset: wrong file's format: " << filePath << std::endl;
         exit(1);
     }
 
     if(!std::getline(in, curRule)){
-        std::cerr << "wrong file's format: " << filePath << std::endl;
+        std::cerr << "preset: wrong file's format: " << filePath << std::endl;
         exit(1);
     }
 
@@ -37,13 +37,13 @@ void Preset::unload(Universe &u, Rule &r) {
     FileReader reader(path);
     std::string curLine = reader.next();
     if(curLine != "#Life 1.06"){
-        std::cout << "incorrect file's format" << std::endl;
+        std::cout << "preset: incorrect file's format" << std::endl;
         exit(1);
     }
     curLine = reader.next();
     size_t un1 = curLine.find_first_not_of("#N ");
     if (un1 == std::string::npos){
-        std::cout << "incorrect universe's name in file" << std::endl;
+        std::cout << "preset: incorrect universe's name in file" << std::endl;
         exit(1);
     }
     size_t un2 = curLine.find_first_of(' ', un1);
@@ -64,7 +64,7 @@ void Preset::unload(Universe &u, Rule &r) {
         int x, y;
         takeTwoInt(x, y, curLine);
         if(!(0<=x && x<=width) || !(0<=y && y<=height)){
-            std::cout << "incorrect universe cell coordinates in file" << std::endl;
+            std::cout << "preset: incorrect universe cell coordinates in file" << std::endl;
             exit(1);
         }
         startField[(height - 1 - y) * width + x] = 1;

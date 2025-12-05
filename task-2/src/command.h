@@ -12,47 +12,44 @@
 
 class Command {
 public:
-    virtual void execute() = 0;
+    virtual void execute(Universe& universe, Rule& rule) = 0;
 };
 
 class DumpCommand : public Command{
 public:
-    DumpCommand(Universe& universe, Rule& rule, std::string& dumpPath);
-    void execute() override;
+    DumpCommand(std::string& dumpPath);
+    void execute(Universe& universe, Rule& rule) override;
 private:
-    Universe& universe;
-    Rule& rule;
     std::string dumpPath;
 };
 
 class TickCommand : public Command{
 public:
-    TickCommand(Universe& universe, Rule& rule, int numOfTicks);
-    void execute() override;
+    TickCommand(int numOfTicks);
+    void execute(Universe& universe, Rule& rule) override;
+    int getNumOfTicks();
 private:
-    Universe& universe;
-    Rule& rule;
     int numOfTicks;
 };
 
 class HelpCommand : public Command{
 public:
     HelpCommand() = default;
-    void execute() override;
+    void execute(Universe& universe, Rule& rule) override;
 private:
 };
 
 class ExitCommand : public Command{
 public:
     ExitCommand() = default;
-    void execute() override;
+    void execute(Universe& universe, Rule& rule) override;
 private:
 };
 
 class ErrorCommand : public Command{
 public:
     ErrorCommand(const std::string& errorMessage);
-    void execute() override;
+    void execute(Universe& universe, Rule& rule) override;
 private:
 };
 

@@ -7,7 +7,7 @@
 class Render {
 public:
     explicit Render(bool isClear=false);
-    void draw(const uint8_t* data, int w, int h) noexcept;
+    void draw(const uint8_t* data, int w, int h) const noexcept;
 private:
     bool isClear;
 };

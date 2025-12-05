@@ -10,12 +10,10 @@
 
 class CommandParser {
 public:
-    CommandParser(Universe& universe, Rule& rule);
+    CommandParser() = default;
     Command* parseCommand(std::string& string);
 private:
-    bool getNWordFromString(int N, const std::string& s, std::string& out);
-    Universe& universe;
-    Rule& rule;
+    bool getWordFromString(int pos, const std::string& s, std::string& out);
 };
 
 

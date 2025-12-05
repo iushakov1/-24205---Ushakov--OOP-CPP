@@ -28,14 +28,17 @@ add_executable(task_2
 find_package(GTest REQUIRED)
 
 add_executable(UnitTests
-        tests/parsertest.cpp
-        tests/presetiotest.cpp
-        tests/presetregistrytest.cpp
-        tests/rendertest.cpp
-        tests/simulator.cpp
         tests/ruletests.cpp
-        tests/stepper.cpp
         tests/universetests.cpp
+        tests/commandtests.cpp
+        tests/commandparsertests.cpp
+        tests/modeparser.cpp
+        tests/presettests.cpp
+        tests/presetregistry.cpp
+        tests/filereadertests.cpp
+        tests/filewrittertests.cpp
+        tests/modetests.cpp
+
 )
 
 target_link_libraries(UnitTests PRIVATE
@@ -46,10 +49,15 @@ target_include_directories(UnitTests PRIVATE
 )
 
 target_sources(UnitTests PRIVATE
-        src/universe.cpp
         src/rule.cpp
+        src/universe.cpp
+        src/command.cpp
+        src/commandparser.cpp
         src/filereader.cpp
         src/filewritter.cpp
+        src/mode.cpp
+        src/modeparser.cpp
+        src/preset.cpp
         src/presetregistry.cpp
         src/render.cpp
 )

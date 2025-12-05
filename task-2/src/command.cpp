@@ -6,11 +6,11 @@
 
 #include "command.h"
 #include "filewritter.h"
-#include "mode.h"
+#include "render.h"
 
-DumpCommand::DumpCommand(Universe &universe, Rule &rule, std::string &dumpPath) : universe(universe), rule(rule), dumpPath(dumpPath) {}
+DumpCommand::DumpCommand(std::string &dumpPath) : dumpPath(dumpPath) {}
 
-void DumpCommand::execute() {
+void DumpCommand::execute(Universe &universe, Rule &rule) {
     FileWriter writer(dumpPath);
     writer.write("#Life 1.06");
     writer.write("#N " + universe.getName());
@@ -26,21 +26,27 @@ void DumpCommand::execute() {
     }
 }
 
-TickCommand::TickCommand(Universe &universe, Rule &rule, int numOfTicks):universe(universe), rule(rule), numOfTicks(numOfTicks) {}
+TickCommand::TickCommand(int numOfTicks): numOfTicks(numOfTicks) {}
 
-void TickCommand::execute() {
+void TickCommand::execute(Universe &universe, Rule &rule) {
     for(int i = 0; i < numOfTicks; ++i){
         universe.evolve(rule);
     }
+    Render render(false);
+    render.draw(universe.getCurData(), universe.getWidth(), universe.getHeight());
 }
 
-void HelpCommand::execute() {
+int TickCommand::getNumOfTicks() {
+    return numOfTicks;
+}
+
+void HelpCommand::execute(Universe &universe, Rule &rule) {
     std::cout << "dump <filename>: saves current life file\n"
               << "tick <n>: scroll to n life's stage and show it\n" <<
               "exit: end the program" << std::endl;
 }
 
-void ExitCommand::execute() {
+void ExitCommand::execute(Universe &universe, Rule &rule) {
     exit(0);
 }
 
@@ -48,6 +54,6 @@ ErrorCommand::ErrorCommand(const std::string& errorMessage) {
     std::cerr << errorMessage << std::endl;
 }
 
-void ErrorCommand::execute() {
-    std::cerr << "cannot execute a wrong command" << std::endl;
+void ErrorCommand::execute(Universe &universe, Rule &rule) {
+    std::cout << "cannot execute an unknown command.\nUse help to see the command list." << std::endl;
 }

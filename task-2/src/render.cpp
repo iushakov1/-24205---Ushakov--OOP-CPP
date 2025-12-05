@@ -1,11 +1,10 @@
 #include "render.h"
 
 #include <iostream>
-#include <utility>
 
 Render::Render(bool clear) : isClear(clear) {}
 
-void Render::draw(const uint8_t *data, int w, int h) noexcept {
+void Render::draw(const uint8_t *data, int w, int h) const noexcept {
     if(!isClear){
         std::cout << "\x1b[2J\x1b[H";
     }

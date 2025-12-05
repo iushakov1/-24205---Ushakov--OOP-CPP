@@ -3,7 +3,6 @@
 #include <array>
 #include <cctype>
 #include <iostream>
-#include <stdexcept>
 
 int Rule::digit_0_8(char c) {
     if (c < '0' || c > '8') return -1;
@@ -50,18 +49,18 @@ Rule::Rule(const std::string& s) {
         if (d >= 0) {
             if (sec == Sec::B) {
                 if (seenB[d]){
-                    std::cerr << "duplicate digit in B" << std::endl;
+                    std::cerr << "rule: duplicate digit in B" << std::endl;
                     exit(1);
                 }
                 seenB[d] = true;
                 birthMask |= (1u << d);
             } else if (sec == Sec::S) {
                 if(!hasB){
-                    std::cerr << "both B and S sections are required" << std::endl;
+                    std::cerr << "rule: both B and S sections are required" << std::endl;
                     exit(1);
                 }
                 if (seenS[d]){
-                    std::cerr << "duplicate digit in S" << std::endl;
+                    std::cerr << "rule: duplicate digit in S" << std::endl;
                     exit(1);
                 }
                 seenS[d] = true;
@@ -69,22 +68,22 @@ Rule::Rule(const std::string& s) {
                 surviveMask |= (1u << d);
             } else {
                 if(hasB == 0 && hasS == 0){
-                    std::cerr << "digit before B/S section" << std::endl;
+                    std::cerr << "rule: digit before B/S section" << std::endl;
                     exit(1);
                 }
                 else if(hasB){
-                    std::cerr << "both B and S sections are required" << std::endl;
+                    std::cerr << "rule: both B and S sections are required" << std::endl;
                 }
             }
             ++i;
             continue;
         }
-        std::cerr << "unexpected character in rule" << std::endl;
+        std::cerr << "rule: unexpected character in rule" << std::endl;
         exit(1);
     }
 
     if (!hasB || !hasS) {
-        std::cerr << "both B and S sections are required" << std::endl;
+        std::cerr << "rule: both B and S sections are required" << std::endl;
         exit(1);
     }
 }
@@ -124,32 +123,32 @@ void Rule::loadRule(const std::string &s) {
         if (d >= 0) {
             if (sec == Sec::B) {
                 if (seenB[d]){
-                    std::cerr << "duplicate digit in B" << std::endl;
+                    std::cerr << "rule: duplicate digit in B" << std::endl;
                     exit(1);
                 }
                 seenB[d] = true;
                 birthMask |= (1u << d);
             } else if (sec == Sec::S) {
                 if (seenS[d]){
-                    std::cerr << "duplicate digit in S" << std::endl;
+                    std::cerr << "rule: duplicate digit in S" << std::endl;
                     exit(1);
                 }
                 seenS[d] = true;
                 surviveMask |= (1u << d);
             } else {
-                std::cerr << "digit before B/S section" << std::endl;
+                std::cerr << "rule: digit before B/S section" << std::endl;
                 exit(1);
             }
             ++i;
             continue;
         }
 
-        std::cerr << "unexpected character in rule" << std::endl;
+        std::cerr << "rule: unexpected character in rule" << std::endl;
         exit(1);
     }
 
     if (!hasB || !hasS) {
-        std::cerr << "both B and S sections are required" << std::endl;
+        std::cerr << "rule: both B and S sections are required" << std::endl;
         exit(1);
     }
 }

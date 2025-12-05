@@ -11,11 +11,9 @@
 
 class ModeParser {
 public:
-    ModeParser(Universe& universe, Rule& rule);
+    ModeParser() = default;
     Mode* parseMode(int argc, char** argv);
 private:
-    Universe& universe;
-    Rule& rule;
 };
 
 #endif //TASK_2_MODEPARSER_H

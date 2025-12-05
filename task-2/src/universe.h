@@ -24,8 +24,8 @@ public:
     int getWidth() const noexcept;
     int getHeight() const noexcept;
     std::string getName() const noexcept;
+    int getInxFromCoordinates(int x, int y) const;
 private:
-    int getInxFromCoordinates(int x, int y);
     int getNumOfNeighbours(int index);
     void swapBuffers() noexcept;
     std::vector<uint8_t> curField;

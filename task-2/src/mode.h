@@ -16,34 +16,27 @@ public:
 
 class PresetMode: public Mode{
 public:
-    PresetMode(Universe& universe, Rule& rule, std::string = "presets");
+    PresetMode() =default;
     void start() override;
     void description() override;
 private:
-    Universe& universe;
-    Rule& rule;
-    std::string presetDir;
 };
 
 class FileMode: public Mode{
 public:
-    FileMode(Universe& universe, Rule& rule, std::string filePath);
+    FileMode(std::string filePath);
     void start() override;
     void description() override;
 private:
-    Universe& universe;
-    Rule& rule;
     std::string filePath;
 };
 
 class OfflineMode: public Mode{
 public:
-    OfflineMode(Universe& universe, Rule& rule, std::string inputPath, int ticks, std::string outputPath);
+    OfflineMode(std::string inputPath, int ticks, std::string outputPath);
     void start() override;
     void description() override{};
 private:
-    Universe& universe;
-    Rule& rule;
     std::string inputPath;
     std::string outputPath;
     int ticks;
