@@ -7,7 +7,7 @@
 #include "presetregistry.h"
 #include "render.h"
 #include "command.h"
-#include "parser.h"
+#include "commandparser.h"
 
 #include <iostream>
 #include <utility>
@@ -62,11 +62,11 @@ void FileMode::start() {
     Render render(false);
     render.draw(universe.getCurData(), universe.getWidth(), universe.getHeight());
 
-    Parser parser(universe, rule);
+    CommandParser commandParser(universe, rule);
     std::string userInput;
     while(true){
         std::getline(std::cin, userInput);
-        auto command = parser.parseCommand(userInput);
+        auto command = commandParser.parseCommand(userInput);
         command->execute();
         render.draw(universe.getCurData(), universe.getWidth(), universe.getHeight());
     }

@@ -12,7 +12,6 @@ add_executable(task_2
         src/filereader.cpp
         src/filewritter.cpp
         src/render.cpp
-        src/parser.cpp
         src/presetregistry.cpp
         src/preset.cpp
         src/preset.h
@@ -20,6 +19,10 @@ add_executable(task_2
         src/command.h
         src/mode.cpp
         src/mode.h
+        src/commandparser.cpp
+        src/commandparser.h
+        src/modeparser.cpp
+        src/modeparser.h
 )
 
 find_package(GTest REQUIRED)
@@ -47,7 +50,6 @@ target_sources(UnitTests PRIVATE
         src/rule.cpp
         src/filereader.cpp
         src/filewritter.cpp
-        src/parser.cpp
         src/presetregistry.cpp
         src/render.cpp
 )

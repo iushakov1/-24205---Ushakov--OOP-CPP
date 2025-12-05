@@ -1,4 +1,5 @@
-#include "parser.h"
+
+#include "modeparser.h"
 #include "presetregistry.h"
 #include "rule.h"
 #include "universe.h"
@@ -9,8 +10,8 @@ public:
     void run(){
         Universe universe;
         Rule rule;
-        Parser parser(universe, rule);
-        auto mode = parser.parseArg(argc, argv);
+        ModeParser modeParser(universe, rule);
+        auto mode = modeParser.parseMode(argc, argv);
         mode->start();
     }
 private:

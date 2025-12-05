@@ -6,6 +6,7 @@
 #define TASK_2_MODE_H
 
 #include <string>
+#include "command.h"
 
 class Mode {
 public:
