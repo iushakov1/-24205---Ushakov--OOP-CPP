@@ -207,24 +207,19 @@ int BitArray::count() const {
     return c;
 }
 
-BitArray::Bit::Bit(std::vector<uint8_t>& bytes, int bitInx) : bytes(bytes), bitInx(bitInx) {}
+BitArray::Bit::Bit(BitArray& bitArray, int bitInx) : bitarray(bitArray), bitInx(bitInx) {}
 BitArray::Bit::operator bool() const noexcept {
-    return bool(( 1<<(byteToBits - bitInx%byteToBits - 1) ) & ( bytes[bitInx/byteToBits] ));
+    return bitarray.bytes[bitInx/byteToBits] & 1<<(byteToBits - bitInx%byteToBits - 1);
 }
 
 BitArray::Bit &BitArray::Bit::operator=(bool v) noexcept {
-    if(!v){
-        bytes[bitInx/byteToBits] &= ~(1 << (byteToBits - bitInx%byteToBits - 1));
-    }
-    else{
-        bytes[bitInx/byteToBits] |= (1 << (byteToBits - bitInx%byteToBits - 1));
-    }
+    bitarray.set(bitInx, v);
     return *this;
 }
 
 BitArray::Bit &BitArray::Bit::operator=(const BitArray::Bit &other) noexcept {
     bool value = static_cast<bool>(other);
-    *this = value;
+    bitarray.set(bitInx, value);
     return *this;
 }
 
@@ -232,7 +227,7 @@ BitArray::Bit BitArray::operator[](int i) {
     if (i < 0 || i >= bytes.size()*byteToBits) {
         throw std::out_of_range("BitArray index out of range");
     }
-    return Bit(bytes, i);
+    return Bit((*this), i);
 }
 
 bool BitArray::operator[](int i) const{

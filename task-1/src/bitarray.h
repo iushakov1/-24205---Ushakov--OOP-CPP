@@ -85,7 +85,7 @@ public:
         /**
          * Create a proxy for the given bit
          */
-        Bit(std::vector<uint8_t>&, int bitInx);
+        Bit(BitArray&, int bitInx);
         /**
          * Set the bit to the given value
          */
@@ -99,7 +99,7 @@ public:
         */
         operator bool() const noexcept;
     private:
-        std::vector<uint8_t>& bytes;
+        BitArray& bitarray;
         int bitInx;
     };
     /**
